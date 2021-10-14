@@ -1,3 +1,7 @@
+<?php
+  include_once './includes/dbprocess.php';
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,8 +12,15 @@
     <!-- LINKS -->
     <link rel="shortcut icon" type="image/jpg" href="./img/logo.png"/>
     <link rel="stylesheet" href="./styles/styles.css">
-    
-    <title>Single entry accounting</title>
+    <link rel="stylesheet" href="./styles/sweetalert.css">
+    <title>Single Entry Accounting</title>
+    <link rel="shortcut icon" type="image/png " href="./img/logo.png">
+
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="./js/sweetalert.min.js"></script>
+
+
 </head>
 <body>
   
@@ -77,27 +88,27 @@
         </div>
         <div class="modal-body">
           
-                <form action="" method="Post">
+                <form action="./includes/dbprocess.php" method="POST">
                  
                    
                     <div class="input-container email">
                         <label for="email">Email</label>
-                        <input type="email"  id="email" name="email"  placeholder="example@domain.com">
+                        <input type="email"  id="email" name="email"  placeholder="example@domain.com" required>
                     </div>
                     <div class="input-container password">
                         <label for="password">Password</label>
-                        <input type="password"  id="password" name="password" placeholder="cover your password">
+                        <input type="password"  id="password" name="password" placeholder="cover your password" required>
                         <i class='bx bx-hide'></i>
                     </div>
                    
                          
                     <div class="login-container">
-                        <p>You dont have an account? <a href="index.php">Sign up</a></p>
+                        <p>You dont have an account? <a href="register.php">Sign up</a></p>
                     </div>
                         <br>
                         <br>
                     <div class="input-container cta">
-                            <button class="signup-btn"> <a href="./Manager/dashboard.php">Sign in </a> </button>
+                            <button class="signup-btn" type="submit" name="login_btn">Sign in</button>
                     </div>
                     <section class="copy-legal">
                         <br>
@@ -114,6 +125,23 @@
       </div>
       <div id="overlay"></div>
 
+
+
+
+            <?php 
+            if (isset($_SESSION['response']) && $_SESSION['response'] !='') { ?>
+
+            <script>
+            swal({
+                title: "<?php echo $_SESSION['response']?>",
+                icon: "<?php echo $_SESSION['res_type']?>",
+                button: "Done",
+            });
+            </script>
+        
+            <?php
+                unset($_SESSION['response']); }
+            ?>
 
 </body>
 
