@@ -9,7 +9,7 @@ include 'includes/menu.php'; ?>
     <div class="title-top">
 
             <div class="title-wrapper">
-                <h2>MICROSOFT COMPANY</h2>
+                <h2>EXAMPLE COMPANY</h2>
             </div>
             <div class="title-wrapper">
                 <h2>Cash book entry</h2>
