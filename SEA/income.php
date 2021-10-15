@@ -1,4 +1,17 @@
-<?php include 'includes/header.php'; 
+<?php 
+
+
+include_once '../includes/dbprocess.php';
+
+if(isset($_SESSION['isLoggedin'])){
+  
+}else{
+  header("Location: ../index.php");
+}
+
+
+
+include 'includes/header.php'; 
 
 include 'includes/menu.php'; ?>
 
@@ -322,6 +335,8 @@ include 'includes/menu.php'; ?>
 
 
   <div class="space" style="height: 100px;"></div>
+
+
  
 </body>
 

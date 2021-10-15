@@ -1,7 +1,21 @@
 
-<?php include 'includes/header.php'; 
+<?php 
 
-include 'includes/menu.php'; ?>
+include_once '../includes/dbprocess.php';
+
+if(isset($_SESSION['isLoggedin'])){
+  
+}else{
+  header("Location: ../index.php");
+}
+
+
+include 'includes/header.php'; 
+
+include 'includes/menu.php'; 
+
+
+?>
 
 
      <div class="heading">
@@ -54,6 +68,7 @@ include 'includes/menu.php'; ?>
             </div>
 
      </div>
+
 
          <?php include 'includes/footer.php' ?>
 
@@ -133,3 +148,6 @@ include 'includes/menu.php'; ?>
         drawMaterialChart();
     };
     </script>
+
+
+           

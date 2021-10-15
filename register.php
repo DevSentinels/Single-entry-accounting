@@ -32,7 +32,7 @@
 
                 </div>
                 <div class="right">
-                            <form action="./includes/dbprocess.php" method="POST">
+                            <form autocomplete="off" action="./includes/dbprocess.php" method="POST">
                                 <section class="copy">
                                     <h2>Sign up</h2>
                                     
@@ -42,19 +42,19 @@
                                     </div>
                                 <div class="input-container name">
                                     <label for="fname">Fullname</label>
-                                    <input type="text"  id="fname" name="fname" required>
+                                    <input autocomplete="off" type="text"  id="fname" name="fname" required>
                                 </div>
                                 <div class="input-container name">
                                     <label for="bname">Business Name</label>
-                                    <input type="text"  id="bname" name="bname" required>
+                                    <input autocomplete="off" type="text"  id="bname" name="bname" required>
                                 </div>
                                 <div class="input-container email">
                                     <label for="email">Email</label>
-                                    <input type="email"  id="email" name="email" required>
+                                    <input autocomplete="off" type="email"  id="email" name="email" required>
                                 </div>
                                 <div class="input-container password">
                                     <label for="password">Password</label>
-                                    <input type="password"  id="password" name="password" placeholder="Must be at least 6 characters" minlength="6" required>
+                                    <input autocomplete="off" type="password"  id="password" name="password" placeholder="Must be at least 6 characters" minlength="6" required>
                                     <i class='bx bx-hide'></i>
                                 </div>
                                

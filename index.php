@@ -16,7 +16,7 @@
     <title>Single Entry Accounting</title>
     <link rel="shortcut icon" type="image/png " href="./img/logo.png">
 
-
+    <link rel="stylesheet" href="./styles/sweetalert.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="./js/sweetalert.min.js"></script>
 

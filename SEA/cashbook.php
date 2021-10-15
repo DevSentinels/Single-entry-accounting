@@ -1,5 +1,18 @@
 
-<?php include 'includes/header.php'; 
+<?php 
+
+
+
+include_once '../includes/dbprocess.php';
+
+if(isset($_SESSION['isLoggedin'])){
+  
+}else{
+  header("Location: ../index.php");
+}
+
+
+include 'includes/header.php'; 
 
 include 'includes/menu.php'; ?>
 
@@ -63,7 +76,7 @@ include 'includes/menu.php'; ?>
 <div class="dropdown">
 <form action="">
           <span class="custom-dropdown big">
-               <select>    
+               <select id="Month">    
                     <option>Month</option>
                     <option>January</option>
                     <option>February</option>
@@ -77,99 +90,131 @@ include 'includes/menu.php'; ?>
                     <option>October</option>
                     <option>November</option>
                     <option>December</option>
-
-                    
                </select>
                </span>
 
                <span class="custom-dropdown big">
-               <select>    
+               <select id="Year">    
                     <option>Year</option>
-                    <option>2020</option>
                     <option>2021</option>
                     <option>2022</option>
                     <option>2023</option>
                     <option>2024</option>
                     <option>2025</option>
                     <option>2026</option>
-
-                    
+                    <option>2027</option>
+                    <option>2028</option>
+                    <option>2029</option>
+                    <option>2030</option>
                </select>
                </span>
           </form>
  </div>
  </div>
+ <script type="text/javascript">
+
+            $(document).ready(function(){
+                const monthNames = ["January", "February", "March", "April", "May", "June",
+                                    "July", "August", "September", "October", "November", "December"];
+
+                var date = new Date();
+
+
+                var currentmonth = monthNames[date.getMonth()];
+                var currentyear = date.getFullYear();   
+
+            $("#Month").val(currentmonth);
+            $("#Year").val(currentyear);
+            });
+</script>
+
+
  <div class="modal" id="modal">
                 <div class="modal-header">
                      <div class="title"></div>
                         <button data-close-button class="close-button">&times;</button>
                         </div>
                         <div class="modal-body">
-                        <form action="">
+                        <form action="../includes/dbprocess.php" Method="POST">
                               
                                 <div class="input-container name combobox">
                                   
-                                <input type="date">
+                                <input type="date" name="date">
                              
                                
-                                   
+
                                 <span class="custom-dropdown big large">
-                                <select>    
-                                        <option>Description</option>
-                                        <option>Beginning balance</option> 
-                                        <option>Investment</option>  
-                                        <option>Sales</option>
-                                        <option>Service Home</option>
-                                        <option>Bank Financing Long Term</option>
-                                        <option>Bank Financing Short Term</option>
-                                        <option>Shareholder Investment</option>
-                                        <option>Other source of cash</option>
-                                        <option>Other Income</option>
-                                        <option>Salaries and Wages</option>
-                                        <option>Rent Expenses</option>
-                                        <option>Amortization Expenses</option>
-                                        <option>Marketing Expenses</option>
-                                        <option>Utilities Expenses</option>
-                                        <option>Insurance Expenses</option>
-                                        <option>Inventory Purchases</option>
-                                        <option>Loan Payments - short term</option>
-                                        <option>Loan Payments - Long term</option>
-                                        <option>Supplies Expenses</option>
-                                        <option>Miscellaneous Expenses</option>
-                                        <option>Interest Income</option>
-                                        <option>Interest Expenses</option>
-                                        <option>Administrative Expenses</option>
-                                        <option>Selling and distribution Expenses</option>
-                                        <option>Other uses of cash </option>
-                                        <option>Other Expenses</option>
-                                        <option>Equipment</option>
-                                        <option>Vehicle</option>
-                                        <option>Furniture</option>
-                                        <option>Other non-current assets</option>
-                                        <option>Ending Balance</option>
-
-
+                                <select name="description">    
+                                        <option value="">Description</option>
+                                        <option value="Beginning balance">Beginning balance</option> 
+                                        <option value="Investment">Investment</option>  
+                                        <option value="Sales">Sales</option>
+                                        <option value="Service Home">Service Home</option>
+                                        <option value="Bank Financing Long Term">Bank Financing Long Term</option>
+                                        <option value="Bank Financing Short Term">Bank Financing Short Term</option>
+                                        <option value="Shareholder Investment">Shareholder Investment</option>
+                                        <option value="Other source of cash">Other source of cash</option>
+                                        <option value="Other Income">Other Income</option>
+                                        <option value="Salaries and Wages">Salaries and Wages</option>
+                                        <option value="Rent Expenses">Rent Expenses</option>
+                                        <option value="Amortization Expenses">Amortization Expenses</option>
+                                        <option value="Marketing Expenses">Marketing Expenses</option>
+                                        <option value="Utilities Expenses">Utilities Expenses</option>
+                                        <option value="Insurance Expenses">Insurance Expenses</option>
+                                        <option value="Inventory Purchases">Inventory Purchases</option>
+                                        <option value="Loan Payments - Short term">Loan Payments - Short term</option>
+                                        <option value="Loan Payments - Long term">Loan Payments - Long term</option>
+                                        <option value="Supplies Expenses">Supplies Expenses</option>
+                                        <option value="Miscellaneous Expenses">Miscellaneous Expenses</option>
+                                        <option value="Interest Income">Interest Income</option>
+                                        <option value="Interest Expenses">Interest Expenses</option>
+                                        <option value="Administrative Expenses">Administrative Expenses</option>
+                                        <option value="Selling and distribution Expenses">Selling and distribution Expenses</option>
+                                        <option value="Other uses of cash">Other uses of cash</option>
+                                        <option value="Other Expenses">Other Expenses</option>
+                                        <option value="Equipment">Equipment</option>
+                                        <option value="Vehicle">Vehicle</option>
+                                        <option value="Furniture">Furniture</option>
+                                        <option value="Other non-current assets">Other non-current assets</option>
+                                        <option value="Ending Balance">Ending Balance</option>
                                 </select>
                                 </span>
                                 </div>
                                 <div class="input-container email">
                                     <label for="text">Inflows</label>
-                                    <input type="text"   name="outflows" placeholder="Input your cash outflows">
+                                    <input type="text" name="inflows" onkeypress="return onlyNumberKey(event)"  name="outflows" placeholder="Input your cash outflows">
                                 </div>
                                 <div class="input-container password">
                                     <label for="text">Outflows</label>
-                                    <input type="text"  name="inflows" placeholder="Input your cash outflows">
-                         
+                                    <input type="text" name="outflows" onkeypress="return onlyNumberKey(event)" name="inflows" placeholder="Input your cash outflows">
                                 </div>
-                               
                                 <div class="input-container cta">
-                                        <button class="signup-btn continue">Continue</button>
+                                        <button type="submit" name="add_entry" class="signup-btn continue">Continue</button>
                                 </div>
                                
                             </form>
                         </div>
                    </div>
+
+                    <script>
+                         function onlyNumberKey(evt) {
+          
+                                 // Only ASCII character in that range allowed
+                                 var ASCIICode = (evt.which) ? evt.which : evt.keyCode
+                                 if (ASCIICode > 31 && (ASCIICode < 48 || ASCIICode > 57))
+                                        return false;
+                                return true;
+                        }
+                    </script>
+
+
             <div id="overlay"></div>
+            <?php
+            $query = "SELECT * FROM tblprofiles WHERE NOT Position = 'Admin'";    
+            $stmt = $conn->prepare($query);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            ?>   
             <table class="content-table table">
             <thead>
                 <tr>
@@ -206,104 +251,6 @@ include 'includes/menu.php'; ?>
                 
                 </td>
                 </tr>
-                <tr>
-                        <td data-label="DATE">June 03</td>
-                        <td data-label="Description">Equipment</td>
-                        <td data-label="Inflows"> <strong></strong> </td>
-                        <td data-label="Outflows"><strong>₱</strong>20,000</td>
-                        <td data-label="Balance"><strong>₱</strong> 370,000</td>
-                        <td data-label="Actions">
-                            <form action="#" class="buttons">
-                            <button type="submit" class="button"  data-modal-target="#modal">
-                            <span class="button__icon">
-                            <ion-icon name="add-circle-outline"></ion-icon>
-                            </span>
-                            </button>
-
-                            <button type="submit" class="button">
-                            <span class="button__icon">
-                            <ion-icon name="trash-outline"></ion-icon>
-                            </span>
-                            </button>
-
-                            </form>
-                        
-                        </td>
-                </tr>
-                <tr>
-                        <td data-label="DATE">June 06</td>
-                        <td data-label="Description">Supplies Expenses</td>
-                        <td data-label="Inflows"> <strong></strong> </td>
-                        <td data-label="Outflows"><strong>₱</strong>1,400</td>
-                        <td data-label="Balance"><strong>₱</strong> 368,600</td>
-                        <td data-label="Actions">
-                            <form action="#" class="buttons">
-                            <button type="submit" class="button"  data-modal-target="#modal">
-                            <span class="button__icon">
-                            <ion-icon name="add-circle-outline"></ion-icon>
-                            </span>
-                            </button>
-
-                            <button type="submit" class="button">
-                            <span class="button__icon">
-                            <ion-icon name="trash-outline"></ion-icon>
-                            </span>
-                            </button>
-
-                            </form>
-                        
-                        </td>
-                </tr>
-                <tr>
-                        <td data-label="DATE">June 08</td>
-                        <td data-label="Description">Selling Distribution Expenses</td>
-                        <td data-label="Inflows"> <strong></strong> </td>
-                        <td data-label="Outflows"><strong>₱</strong>200</td>
-                        <td data-label="Balance"><strong>₱</strong> 368,400</td>
-                        <td data-label="Actions">
-                            <form action="#" class="buttons">
-                            <button type="submit" class="button"  data-modal-target="#modal">
-                            <span class="button__icon">
-                            <ion-icon name="add-circle-outline"></ion-icon>
-                            </span>
-                            </button>
-
-                            <button type="submit" class="button">
-                            <span class="button__icon">
-                            <ion-icon name="trash-outline"></ion-icon>
-                            </span>
-                            </button>
-
-                            </form>
-                        
-                        </td>
-                </tr>
-                <tr>
-                        <td data-label="DATE">June 08</td>
-                        <td data-label="Description">Inventory Purchases</td>
-                        <td data-label="Inflows"> <strong></strong> </td>
-                        <td data-label="Outflows"><strong>₱</strong>152,880</td>
-                        <td data-label="Balance"><strong>₱</strong>215,520</td>
-                        <td data-label="Actions">
-                            <form action="#" class="buttons">
-                            <button type="submit" class="button"  data-modal-target="#modal">
-                            <span class="button__icon">
-                            <ion-icon name="add-circle-outline"></ion-icon>
-                            </span>
-                            </button>
-
-                            <button type="submit" class="button">
-                            <span class="button__icon">
-                            <ion-icon name="trash-outline"></ion-icon>
-                            </span>
-                            </button>
-
-                            </form>
-                        
-                        </td>
-                </tr>
-
-             
                 
             </tbody>
             </table>
@@ -401,7 +348,6 @@ include 'includes/menu.php'; ?>
                         </div>
                                     <div id="overlayIS"></div>
 
-        </body>
 
     <script>
 
@@ -460,5 +406,10 @@ function show3(){
   document.getElementById('Yearly').style.display ='block';
 }
 </script>
+
+
+           
+
+
 
          <?php include 'includes/footer.php' ?>
