@@ -9,8 +9,8 @@ include_once 'dbconnect.php';
 if(isset($_POST['signup_btn'])){
 
     $Email = mysqli_real_escape_string($conn, $_POST['email']);
-    $Fullname = mysqli_real_escape_string($conn, $_POST['fname']);
-    $BusinessName = mysqli_real_escape_string($conn, $_POST['bname']);
+    $Fullname = $_POST['fname'];
+    $BusinessName = $_POST['bname'];
     $PassW = mysqli_real_escape_string($conn, password_hash ($_POST['password'],PASSWORD_DEFAULT));
 
     $sqlforNoAccount = "SELECT * FROM tblaccounts WHERE email ='$Email'";

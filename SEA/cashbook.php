@@ -73,60 +73,54 @@ include 'includes/menu.php'; ?>
 
 </div>
 
+
 <div class="dropdown">
-<form action="">
+<form Method="POST">
           <span class="custom-dropdown big">
-               <select id="Month">    
-                    <option>Month</option>
-                    <option>January</option>
-                    <option>February</option>
-                    <option>March</option>
-                    <option>April</option>
-                    <option>May</option>
-                    <option>June</option>
-                    <option>July</option>
-                    <option>August</option>
-                    <option>September</option>
-                    <option>October</option>
-                    <option>November</option>
-                    <option>December</option>
+               <select id="Month" name="month">    
+                    <option value="">Month</option>
+                    <option value="1">January</option>
+                    <option value="2">February</option>
+                    <option value="3">March</option>
+                    <option value="4">April</option>
+                    <option value="5">May</option>
+                    <option value="6">June</option>
+                    <option value="7">July</option>
+                    <option value="8">August</option>
+                    <option value="9">September</option>
+                    <option value="10">October</option>
+                    <option value="11">November</option>
+                    <option value="12">December</option>
                </select>
                </span>
 
                <span class="custom-dropdown big">
-               <select id="Year">    
+               <select id="Year" name="year">    
                     <option>Year</option>
-                    <option>2021</option>
-                    <option>2022</option>
-                    <option>2023</option>
-                    <option>2024</option>
-                    <option>2025</option>
-                    <option>2026</option>
-                    <option>2027</option>
-                    <option>2028</option>
-                    <option>2029</option>
-                    <option>2030</option>
+                    <option value="2021">2021</option>
+                    <option value="2022">2022</option>
+                    <option value="2023">2023</option>
+                    <option value="2024">2024</option>
+                    <option value="2025">2025</option>
+                    <option value="2026">2026</option>
+                    <option value="2027">2027</option>
+                    <option value="2028">2028</option>
+                    <option value="2029">2029</option>
+                    <option value="2030">2030</option>
                </select>
+               </span>
+               <span>
+                    <button type="buttons" type="submit" name="show_table" class="buttonss">
+                     <span class="button__texts"  >SHOW</span>
+                     <span class="button__icons">
+                     <ion-icon name="add-circle-outline"></ion-icon>
+                     </span>
+                    </button>
                </span>
           </form>
  </div>
  </div>
- <script type="text/javascript">
 
-            $(document).ready(function(){
-                const monthNames = ["January", "February", "March", "April", "May", "June",
-                                    "July", "August", "September", "October", "November", "December"];
-
-                var date = new Date();
-
-
-                var currentmonth = monthNames[date.getMonth()];
-                var currentyear = date.getFullYear();   
-
-            $("#Month").val(currentmonth);
-            $("#Year").val(currentyear);
-            });
-</script>
 
 
  <div class="modal" id="modal">
@@ -182,11 +176,11 @@ include 'includes/menu.php'; ?>
                                 </div>
                                 <div class="input-container email">
                                     <label for="text">Inflows</label>
-                                    <input type="text" name="inflows" onkeypress="return onlyNumberKey(event)"  name="outflows" placeholder="Input your cash outflows">
+                                    <input type="text" id="inflows" name="inflows" onkeypress="return onlyNumberKey(event)"  name="outflows" placeholder="Input your cash outflows">
                                 </div>
                                 <div class="input-container password">
                                     <label for="text">Outflows</label>
-                                    <input type="text" name="outflows" onkeypress="return onlyNumberKey(event)" name="inflows" placeholder="Input your cash outflows">
+                                    <input type="text" id="outflows" name="outflows" onkeypress="return onlyNumberKey(event)" name="inflows" placeholder="Input your cash outflows">
                                 </div>
                                 <div class="input-container cta">
                                         <button type="submit" name="add_entry" class="signup-btn continue">Continue</button>
@@ -204,20 +198,43 @@ include 'includes/menu.php'; ?>
                                  if (ASCIICode > 31 && (ASCIICode < 48 || ASCIICode > 57))
                                         return false;
                                 return true;
+
                         }
+
+                        $(document).ready(function () {
+                                $('#inflows').click(function () {
+                                    
+                                    $('inflows').removeAttr('disabled');
+                                    $('#outflows').attr('disabled', 'disabled');
+                                    
+                                });
+                                $('#outflows').click(function () {
+                                     $('#outflows').removeAttr('disabled');
+                                     $('#inflows').attr('disabled', 'disabled');
+                                });
+                         });
+
+
                     </script>
 
 
             <div id="overlay"></div>
-            <?php
-            $query = "SELECT * FROM tblprofiles WHERE NOT Position = 'Admin'";    
-            $stmt = $conn->prepare($query);
-            $stmt->execute();
-            $result = $stmt->get_result();
-            ?>   
+            <?php       
+                    if(isset($_POST['show_table'])){
+                    $month = $_POST['month'];
+                    $year = $_POST['year'];
+                    $Bname = mysqli_real_escape_string($conn, $Bname);
+
+                    $query = "SELECT cbe_id, date, description, inflows, outflows, balance FROM tblcashbookentry WHERE ((MONTH(date) = '$month' AND YEAR(date)= '$year') AND (business_name = '$Bname')) ORDER BY date ASC";    
+                    $stmt = $conn->prepare($query);
+                    $stmt-> execute();
+                    $result = $stmt->get_result();  
+                    
+             ?>    
             <table class="content-table table">
             <thead>
                 <tr>
+                <th hidden>ID</th>
                 <th>Date</th>
                 <th>Description</th>
                 <th>Inflows</th>
@@ -227,12 +244,14 @@ include 'includes/menu.php'; ?>
                 </tr>
             </thead>
             <tbody>
+            <?php while ($row = $result->fetch_assoc()) { ?>
                 <tr>
-                <td data-label="DATE">June 01</td>
-                <td data-label="Description">Investment</td>
-                <td data-label="Inflows"> <strong>₱ </strong>390,000</td>
-                <td data-label="Outflows"></td>
-                <td data-label="Balance"><strong>₱ </strong>390,000</td>
+                <td data-label="ID" hidden><?= $row['cbe_id'] ?></td>
+                <td data-label="Date"><?= $row['date'] ?></td>
+                <td data-label="Description"><?= $row['description'] ?></td>
+                <td data-label="Inflows"> <strong>₱ </strong><?= $row['inflows'] ?></td>
+                <td data-label="Outflows"><strong>₱ </strong><?= $row['outflows'] ?></td>
+                <td data-label="Balance"><strong>₱ </strong><?= $row['balance'] ?></td>
                 <td data-label="Actions">
                     <form action="#" class="buttons">
                     <button type="submit" class="button"  data-modal-target="#modal">
@@ -251,7 +270,7 @@ include 'includes/menu.php'; ?>
                 
                 </td>
                 </tr>
-                
+            <?php } }?> 
             </tbody>
             </table>
 
@@ -407,8 +426,6 @@ function show3(){
 }
 </script>
 
-
-           
 
 
 
