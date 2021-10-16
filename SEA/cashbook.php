@@ -46,28 +46,33 @@ include 'includes/menu.php'; ?>
             <ion-icon name="reader-outline"></ion-icon>
         </span>
         </button>
-
+<span >
         <button type="buttons"  data-modal-target="#modal2" class="buttonss">
             <span class="button__texts">INCOME STATEMENT</span>
             <span class="button__icons">
             <ion-icon name="wallet-outline"></ion-icon>
         </span>
         </button>
+        </span>
 </div>
 
 <div class="print">
+    <span data-tooltip="PRINT RECORDS">
         <button type="button" data-modal-target="#modal2" class="buttonss">
             <span class="button__texts">PRINT</span>
             <span class="button__icons">
             <ion-icon name="receipt-outline"></ion-icon>
         </span>
         </button>
+    </span>
+       <span data-tooltip="DOWNLOAD RECORDS">
         <button type="buttons" data-modal-target="#modal2" class="buttonss">
             <span class="button__texts">Download</span>
             <span class="button__icons">
             <ion-icon name="download-outline"></ion-icon>
         </span>
         </button>
+        </span>
 </div>
 
 
@@ -109,8 +114,8 @@ include 'includes/menu.php'; ?>
                     <option value="2030">2030</option>
                </select>
                </span>
-               <span>
-                    <button type="buttons" type="submit" name="show_table" class="buttonss">
+               <span data-tooltip="Show records" >
+                    <button   style="background-color:#be6a15;" type="buttons" type="submit" name="show_table" class="buttonss">
                      <span class="button__texts"  >SHOW</span>
                      <span class="button__icons">
                      <ion-icon name="add-circle-outline"></ion-icon>
@@ -174,14 +179,24 @@ include 'includes/menu.php'; ?>
                                 </select>
                                 </span>
                                 </div>
+                                <div class="radio-container">
+                                        <div class="container">
+                                            <input type="radio" name="amount" id="in">
+                                            <label for="in">Inflows</label>
+                                        </div>
+
+                                      <div class="container">
+                                            <input type="radio" name="amount" id="out">
+                                            <label for="out">Outflow</label>
+                                    </div>
+                                </div>
+
+
                                 <div class="input-container email">
-                                    <label for="text">Inflows</label>
-                                    <input type="text" id="inflows" name="inflows" onkeypress="return onlyNumberKey(event)"  name="outflows" placeholder="Input your cash outflows">
+                                 
+                                    <input type="text" id="inflows" name="inflows" onkeypress="return onlyNumberKey(event)"  name="outflows" placeholder="Input your amount">
                                 </div>
-                                <div class="input-container password">
-                                    <label for="text">Outflows</label>
-                                    <input type="text" id="outflows" name="outflows" onkeypress="return onlyNumberKey(event)" name="inflows" placeholder="Input your cash outflows">
-                                </div>
+                                
                                 <div class="input-container cta">
                                         <button type="submit" name="add_entry" class="signup-btn continue">Continue</button>
                                 </div>
@@ -254,18 +269,21 @@ include 'includes/menu.php'; ?>
                 <td data-label="Balance"><strong>₱ </strong><?= $row['balance'] ?></td>
                 <td data-label="Actions">
                     <form action="#" class="buttons">
+                    <span data-tooltip="Edit record">
                     <button type="submit" class="button"  data-modal-target="#modal">
                     <span class="button__icon">
                     <ion-icon name="add-circle-outline"></ion-icon>
                     </span>
                     </button>
+                    </span>
 
+                    <span data-tooltip="delete record">
                     <button type="submit" class="button">
                     <span class="button__icon">
                     <ion-icon name="trash-outline"></ion-icon>
                     </span>
                     </button>
-
+                    </span>
                     </form>
                 
                 </td>

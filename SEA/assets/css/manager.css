@@ -224,11 +224,9 @@ img {
   padding-bottom: 3rem;
   overflow: auto;
   scrollbar-width: none;
-  /* For mozilla */
   max-width: 100%;
 }
 
-/* For Google Chrome and others */
 .nav__container::-webkit-scrollbar {
   display: none;
 }
@@ -325,29 +323,24 @@ img {
   transition: .4s;
 }
 
-/* Show dropdown collapse */
 .nav__dropdown:hover {
   max-height: 100rem;
 }
 
-/* Rotate icon arrow */
 .nav__dropdown:hover .nav__dropdown-icon {
   -webkit-transform: rotate(180deg);
           transform: rotate(180deg);
 }
 
-/*===== Show menu =====*/
 .show-menu {
   left: 0;
 }
 
-/*===== Active link =====*/
 .active {
   color: var(--first-color);
 }
 
 /* ========== MEDIA QUERIES ==========*/
-/* For small devices reduce search*/
 @media screen and (max-width: 320px) {
   .header__search {
     width: 70%;
@@ -385,7 +378,6 @@ img {
     left: 0;
     padding: 1.2rem 1.5rem 0;
     width: 68px;
-    /* Reduced navbar */
   }
   .nav__items {
     row-gap: 1.7rem;
@@ -393,7 +385,6 @@ img {
   .nav__icon {
     font-size: 1.3rem;
   }
-  /* Element opacity */
   .nav__logo-name,
   .nav__name,
   .nav__subtitle,
@@ -402,11 +393,9 @@ img {
     -webkit-transition: .3s;
     transition: .3s;
   }
-  /* Navbar expanded */
   .nav:hover {
     width: var(--nav-width);
   }
-  /* Visible elements */
   .nav:hover .nav__logo-name {
     opacity: 1;
   }
@@ -995,7 +984,7 @@ input[type="date"] {
   width: 250px;
   background: #fff;
   border: 1px solid #ccc;
-  margin-bottom: 20px;
+  margin: 10px;
   -webkit-transition: 0.3s;
   transition: 0.3s;
   border-radius: 5px;
@@ -1185,6 +1174,10 @@ input[type="date"] {
   margin: auto;
 }
 
+.wrapper input[type="radio"] {
+  display: none;
+}
+
 .wrapper .option {
   max-width: 100%;
   background: #fff;
@@ -1235,10 +1228,6 @@ input[type="date"] {
           transform: scale(1.5);
   -webkit-transition: all 0.3s ease;
   transition: all 0.3s ease;
-}
-
-input[type="radio"] {
-  display: none;
 }
 
 #option-1:checked:checked ~ .option-1,
@@ -1314,6 +1303,7 @@ label {
   border-radius: 10px;
   z-index: 10;
   background-color: white;
+  padding: 14px;
   max-width: 100%;
 }
 
@@ -1347,5 +1337,103 @@ label {
 #overlay3.active {
   opacity: 1;
   pointer-events: all;
+}
+
+.container input[type="radio"] {
+  display: none;
+}
+
+.container label {
+  color: #17b978;
+  font-family: 'poppins' , sans-serif;
+  font-size: 20px;
+  border: 2px solid #17b978;
+  border-radius: 4px;
+  padding: 5px 20px;
+  margin: 1rem;
+  cursor: pointer;
+}
+
+.container label ::before {
+  content: "";
+  height: 30px;
+  width: 30px;
+  border: 3px solid #17b978;
+  border-radius: 50%;
+  margin-right: 20px;
+}
+
+.container input[type="radio"]:checked + label {
+  background-color: #17b978;
+  color: #fff;
+}
+
+.container input[type="radio"]:checked + label::before {
+  height: 16px;
+  width: 16px;
+  border: 10px solid #fff;
+  background-color: #17b978;
+}
+
+.radio-container {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+
+[data-tooltip] {
+  position: relative;
+  cursor: pointer;
+}
+
+[data-tooltip]::after {
+  position: absolute;
+  width: 140px;
+  left: calc(50%-70px);
+  bottom: 100%;
+  text-align: center;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+  color: #fff;
+  content: attr(data-tooltip);
+  background-color: #6d6d6d;
+  padding: 8px;
+  border-radius: 10px;
+  font-size: 0.9em;
+  font-weight: bold;
+  opacity: 0;
+  visibility: hidden;
+  -webkit-transform: translateY(10px);
+          transform: translateY(10px);
+  -webkit-transition: opacity 0.3s, -webkit-transform 0.3s;
+  transition: opacity 0.3s, -webkit-transform 0.3s;
+  transition: opacity 0.3s, transform 0.3s;
+  transition: opacity 0.3s, transform 0.3s, -webkit-transform 0.3s;
+}
+
+[data-tooltip]:hover::after {
+  opacity: 1;
+  visibility: visible;
+  -webkit-transform: translateY(0);
+          transform: translateY(0);
+}
+
+.search {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+
+.search .button-wrapper button {
+  -webkit-box-flex: 1;
+      -ms-flex: 1;
+          flex: 1;
+  width: 80px;
+}
+
+.search input {
+  -webkit-box-flex: 1;
+      -ms-flex: 1;
+          flex: 1;
 }
 /*# sourceMappingURL=manager.css.map */

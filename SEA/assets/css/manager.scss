@@ -559,6 +559,8 @@ overflow: hidden;
   font-weight: 500;
   cursor: pointer;
   margin: 4px;
+  
+  
 }
 
 .buttonss:hover {
@@ -883,7 +885,7 @@ label{
   width: 250px;
   background: #fff;
   border: 1px solid #ccc;
-  margin-bottom: 20px;
+  margin: 10px;
   transition: 0.3s;
   border-radius: 5px;
   border: none;
@@ -1060,7 +1062,9 @@ label{
   padding: 10px 5px;
  margin: auto;
  
- 
+ input[type="radio"]{
+  display: none;
+}
 }
 .wrapper .option{
   max-width: 100%;
@@ -1103,9 +1107,7 @@ label{
   transform: scale(1.5);
   transition: all 0.3s ease;
 }
-input[type="radio"]{
-  display: none;
-}
+
 #option-1:checked:checked ~ .option-1,
 #option-2:checked:checked ~ .option-2,
 #option-3:checked:checked ~ .option-3{
@@ -1175,7 +1177,7 @@ label{
   border-radius: 10px;
   z-index: 10;
   background-color: white;
- 
+ padding: 14px;
   max-width: 100%;
 }
 
@@ -1208,8 +1210,87 @@ label{
   pointer-events: all;
 }
 
+.container{
+  
 
+  input[type="radio"]{
+   display: none;
+  }
 
+  label{
+    color: #17b978;
+    font-family: 'poppins' , sans-serif;
+    font-size: 20px;
+    border: 2px solid #17b978 ;
+    border-radius: 4px;
+    padding: 5px 20px;
+    margin: 1rem;
+    cursor: pointer;
+    ::before{
+      content:"";
+      height: 30px;
+      width: 30px;
+      border: 3px solid #17b978;
+      border-radius: 50%;
+      margin-right: 20px;
+    }
+  }
+  input[type="radio"]:checked + label{
+    background-color:#17b978;
+    color: #fff;
+  }
+  input[type="radio"]:checked +label::before{
+    height: 16px;
+    width: 16px;
+    border: 10px solid #fff;
+    background-color: #17b978;
+  }
+}
+.radio-container{
+  display: flex;
+}
 
+[data-tooltip]{
+  position: relative;
+  cursor: pointer;
 
+}
+[data-tooltip]::after{
+  position: absolute;
+  width: 140px;
+  left: calc(50%-70px);
+  
+  bottom: 100%;
+  text-align: center;
+  box-sizing: border-box;
+  color: #fff;
+  content: attr(data-tooltip);
+  background-color: #6d6d6d;
+  padding: 8px ;
+  border-radius: 10px;
+  font-size: 0.9em;
+  font-weight: bold;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(10px);
+transition: opacity 0.3s, transform 0.3s;
+}
+[data-tooltip]:hover::after{
+opacity: 1;
+visibility: visible;
+transform: translateY(0);
+}
 
+.search{
+  display: flex;
+  
+ 
+  .button-wrapper button{
+    flex: 1;
+    width: 80px;
+  }
+  input{
+    flex: 1
+    ;
+  }
+}
