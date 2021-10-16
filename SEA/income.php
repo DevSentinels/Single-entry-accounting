@@ -242,10 +242,19 @@ include 'includes/menu.php'; ?>
 
                  
                    
-                 <div class="input-container text">
-                     <label for="text">Year</label>
-                     <input type="text"  id="text" name="text"  placeholder="YEAR">
-                 </div>
+               <div class="search">
+                    
+                    <input type="text"  id="text" name="text"  placeholder="YEAR">
+                     
+                     <div class="button-wrapper">
+                     <button class="buttonss views search-btn" type="submit" name="Search">
+                         <span class="button__texts">FIND</span>
+                         <span class="button__icons">
+                         <ion-icon name="search-outline"></ion-icon>
+                         </span>
+                     </button>
+                     </div>
+                </div>
                  
             </div>     
          </div>
@@ -263,19 +272,36 @@ include 'includes/menu.php'; ?>
 
 
                         </span>
-                        <div class="input-container text">
-                            <label for="text">Year</label>
-                            <input type="text"  id="text" name="text"  placeholder="YEAR">
-                        </div>
-                      
+                        <div class="search">
+                    
+                    <input type="text"  id="text" name="text"  placeholder="YEAR">
+                     
+                     <div class="button-wrapper">
+                     <button class="buttonss views search-btn" type="submit" name="Search">
+                         <span class="button__texts">FIND</span>
+                         <span class="button__icons">
+                         <ion-icon name="search-outline"></ion-icon>
+                         </span>
+                     </button>
+                     </div>
+                </div>
                                 
                         </div>
                     <div id="Yearly" class="hide">
 
-                    <div class="input-container text">
-                     <label for="text">Year</label>
-                     <input type="text"  id="text" name="text"  placeholder="YEAR">
-                 </div>
+                    <div class="search">
+                    
+                    <input type="text"  id="text" name="text"  placeholder="YEAR">
+                     
+                     <div class="button-wrapper">
+                     <button class="buttonss views search-btn" type="submit" name="Search">
+                         <span class="button__texts">FIND</span>
+                         <span class="button__icons">
+                         <ion-icon name="search-outline"></ion-icon>
+                         </span>
+                     </button>
+                     </div>
+                </div>
                
                     </div>
 
