@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 16, 2021 at 03:15 PM
+-- Generation Time: Oct 21, 2021 at 01:55 PM
 -- Server version: 10.4.19-MariaDB
 -- PHP Version: 7.4.19
 
@@ -40,7 +40,7 @@ CREATE TABLE `tblaccounts` (
 --
 
 INSERT INTO `tblaccounts` (`user_id`, `email`, `password`, `business_name`, `business_owner`) VALUES
-(14, 'micacsnr@gmail.com', '$2y$10$0ClOzV34ePE6mEu96oyMUe62.V3gqBEdQ8mUHNYRYbwzC0JLTthWu', 'M Finds', 'Mica Ella M. Casiño'),
+(14, 'micacsnr@gmail.com', '$2y$10$0ClOzV34ePE6mEu96oyMUe62.V3gqBEdQ8mUHNYRYbwzC0JLTthWu', 'M Finds', 'Mica Ella C. Rocela'),
 (15, 'dhory@gmail.com', '$2y$10$S8HaDljtZFYCt30n6ZHDHuE5sRCKzq/l64IdpMY3S2YYE6xHSfrLi', 'Mar\'s Paluto', 'Teodora Rocela'),
 (16, 'rrocela@gmail.com', '$2y$10$Is00m90UTCtkOb17kgEu0eiSEVeL3JSciJn7VHpNXY.C6r1jke/ii', 'Renuel\\\'s Peanut Butter', 'Renuel Rocela'),
 (17, 'rr@gmail.com', '$2y$10$GxBQUdxDpgZY4ppxQHc.juGPR1pjRXuVF4y1yoz5y86Ri1AJyfk9G', 'R\'s', 'R');
@@ -55,6 +55,7 @@ CREATE TABLE `tblcashbookentry` (
   `cbe_id` int(11) NOT NULL,
   `business_name` varchar(100) NOT NULL,
   `date` date NOT NULL,
+  `order_by` int(11) NOT NULL,
   `description` varchar(100) NOT NULL,
   `inflows` int(255) NOT NULL,
   `outflows` int(255) NOT NULL,
@@ -65,14 +66,18 @@ CREATE TABLE `tblcashbookentry` (
 -- Dumping data for table `tblcashbookentry`
 --
 
-INSERT INTO `tblcashbookentry` (`cbe_id`, `business_name`, `date`, `description`, `inflows`, `outflows`, `balance`) VALUES
-(1, 'M Finds', '2021-10-15', 'Beginning balance', 10000, 0, 10000),
-(2, 'M Finds', '2021-10-18', 'Vehicle', 0, 5000, 5000),
-(3, 'M Finds', '2021-10-18', 'Other Income', 15000, 0, 20000),
-(4, 'M Finds', '2021-10-27', 'Utilities Expenses', 0, 10000, 10000),
-(5, 'M Finds', '2021-10-26', 'Furniture', 0, 500, 9500),
-(6, 'M Finds', '2021-11-02', 'Beginning balance', 100000, 0, 110000),
-(7, 'R\'s', '2021-10-01', 'Beginning balance', 1000000, 0, 1000000);
+INSERT INTO `tblcashbookentry` (`cbe_id`, `business_name`, `date`, `order_by`, `description`, `inflows`, `outflows`, `balance`) VALUES
+(50, 'M Finds', '2021-10-01', 1, 'Beginning balance', 100000, 0, 100000),
+(55, 'M Finds', '2021-10-02', 1, 'Other Income', 18000, 0, 268500),
+(57, 'M Finds', '2021-10-01', 3, 'Other Income', 70000, 0, 170000),
+(58, 'M Finds', '2021-10-02', 2, 'Investment', 0, 55000, 213500),
+(59, 'M Finds', '2021-10-02', 3, 'Investment', 0, 25000, 188500),
+(60, 'M Finds', '2021-10-01', 4, 'Salaries and Wages', 0, 20000, 150000),
+(64, 'M Finds', '2021-10-01', 5, 'Furniture', 0, 2500, 147500),
+(66, 'M Finds', '2021-10-01', 6, 'Sales', 100000, 0, 247500),
+(68, 'M Finds', '2021-10-01', 7, 'Interest Income', 3000, 0, 250500),
+(111, 'M Finds', '2021-10-05', 1, 'Sales', 1000, 0, 189500),
+(118, 'M Finds', '2021-10-07', 2, 'Rent Expenses', 0, 50000, 139500);
 
 -- --------------------------------------------------------
 
@@ -148,7 +153,7 @@ ALTER TABLE `tblaccounts`
 -- AUTO_INCREMENT for table `tblcashbookentry`
 --
 ALTER TABLE `tblcashbookentry`
-  MODIFY `cbe_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `cbe_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=119;
 
 --
 -- AUTO_INCREMENT for table `tblcashflow`

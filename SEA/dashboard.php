@@ -18,16 +18,15 @@ include 'includes/menu.php';
 ?>
 
 
-     <div class="heading">
-          <h2>
-          Chart and Graph Report
+     <div class="title-top">
 
-          </h2>
-
-          <form action="">
-         
-          </form>
-     </div>
+            <div class="title-wrapper">
+                <h2><?php echo $_SESSION['business_name']?></h2>
+            </div>
+            <div class="title-wrapper">
+                <h2>Annual Report</h2>
+            </div>
+    </div>
 
      <span class="custom-dropdown big">
                <select>    
@@ -68,6 +67,23 @@ include 'includes/menu.php';
             </div>
 
      </div>
+
+
+     
+            <?php 
+            if (isset($_SESSION['response']) && $_SESSION['response'] !='') { ?>
+
+            <script>
+            swal({
+                title: "<?php echo $_SESSION['response']?>",
+                icon: "<?php echo $_SESSION['res_type']?>",
+                button: "Done",
+            });
+            </script>
+        
+            <?php
+                unset($_SESSION['response']); }
+            ?>
 
 
          <?php include 'includes/footer.php' ?>

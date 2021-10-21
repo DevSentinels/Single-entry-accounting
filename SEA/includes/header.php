@@ -20,9 +20,14 @@ include_once '../includes/dbprocess.php';
      <script type="text/javascript" src="https://www.google.com/jsapi"></script>
 
 
-    <link rel="stylesheet" href="./styles/sweetalert.css">
+    
+     <title>Single Entry Accounting</title>
+    <link rel="shortcut icon" type="image/png " href="../img/logo.png">
+
+
+    <link rel="stylesheet" href="../styles/sweetalert.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <script src="./js/sweetalert.min.js"></script>
+    <script src="../js/sweetalert.min.js"></script>
 
 
    </head>
@@ -47,24 +52,6 @@ include_once '../includes/dbprocess.php';
                 </div>
 
             </div>
-
-
-            
-            <?php 
-            if (isset($_SESSION['response']) && $_SESSION['response'] !='') { ?>
-
-            <script>
-            swal({
-                title: "<?php echo $_SESSION['response']?>",
-                icon: "<?php echo $_SESSION['res_type']?>",
-                button: "Done",
-            });
-            </script>
-        
-            <?php
-                unset($_SESSION['response']); }
-            ?>
-            
     </body>
   
 </html>

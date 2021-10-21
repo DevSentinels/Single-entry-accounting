@@ -1,5 +1,12 @@
 <?php
   include_once './includes/dbprocess.php';
+
+  if(isset($_SESSION['isLoggedin'])){
+    header("Location: ./SEA/dashboard.php");
+  }else{
+      
+  }
+
 ?>
 
 <!DOCTYPE html>

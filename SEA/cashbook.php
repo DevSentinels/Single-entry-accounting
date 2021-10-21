@@ -14,15 +14,35 @@ if(isset($_SESSION['isLoggedin'])){
 
 include 'includes/header.php'; 
 
-include 'includes/menu.php'; ?>
+include 'includes/menu.php'; 
 
-<body>
+
+?>
+
+<body onload="setDataOnSelection()">
+
+
+
+            <?php 
+            if (isset($_SESSION['response']) && $_SESSION['response'] !='') { ?>
+
+            <script>
+            swal({
+                title: "<?php echo $_SESSION['response']?>",
+                icon: "<?php echo $_SESSION['res_type']?>",
+                button: "Done",
+            });
+            </script>
+        
+            <?php
+                unset($_SESSION['response']); }
+            ?>
 
 
     <div class="title-top">
 
             <div class="title-wrapper">
-                <h2>MICROSOFT COMPANY</h2>
+                <h2><?php echo $_SESSION['business_name']?></h2>
             </div>
             <div class="title-wrapper">
                 <h2>Cash book entry</h2>
@@ -32,22 +52,23 @@ include 'includes/menu.php'; ?>
 <div class="cover">
 <div class="box">
 <div class="top">
-        <button type="buttons" data-modal-target="#modal" class="buttonss">
+        <button type="buttons" data-modal-target="#modal" class="buttonss" id="newData">
             <span class="button__texts"  >NEW</span>
             <span class="button__icons">
             <ion-icon name="add-circle-outline"></ion-icon>
         </span>
         </button>
         
-
-        <button type="buttons"  data-modal-target="#modal2" class="buttonss">
+        <span data-tooltip="GENERATE CF" >
+        <button type="buttons"  data-modal-target="#modal2" class="buttonss" id="btnCashFlow">
             <span class="button__texts">CASHFLOW</span>
             <span class="button__icons">
             <ion-icon name="reader-outline"></ion-icon>
         </span>
         </button>
-<span >
-        <button type="buttons"  data-modal-target="#modal2" class="buttonss">
+    </span>
+        <span data-tooltip="GENERATE IS" >
+        <button type="buttons"  data-modal-target="#modal2" class="buttonss" id="btnIncomeStatement">
             <span class="button__texts">INCOME STATEMENT</span>
             <span class="button__icons">
             <ion-icon name="wallet-outline"></ion-icon>
@@ -58,7 +79,7 @@ include 'includes/menu.php'; ?>
 
 <div class="print">
     <span data-tooltip="PRINT RECORDS">
-        <button type="button" data-modal-target="#modal2" class="buttonss">
+        <button type="button" data-modal-target="#modal2" class="buttonss" id="btnPrint">
             <span class="button__texts">PRINT</span>
             <span class="button__icons">
             <ion-icon name="receipt-outline"></ion-icon>
@@ -66,7 +87,7 @@ include 'includes/menu.php'; ?>
         </button>
     </span>
        <span data-tooltip="DOWNLOAD RECORDS">
-        <button type="buttons" data-modal-target="#modal2" class="buttonss">
+        <button type="buttons" data-modal-target="#modal2" class="buttonss" id="btnDownload">
             <span class="button__texts">Download</span>
             <span class="button__icons">
             <ion-icon name="download-outline"></ion-icon>
@@ -84,15 +105,15 @@ include 'includes/menu.php'; ?>
           <span class="custom-dropdown big">
                <select id="Month" name="month">    
                     <option value="">Month</option>
-                    <option value="1">January</option>
-                    <option value="2">February</option>
-                    <option value="3">March</option>
-                    <option value="4">April</option>
-                    <option value="5">May</option>
-                    <option value="6">June</option>
-                    <option value="7">July</option>
-                    <option value="8">August</option>
-                    <option value="9">September</option>
+                    <option value="01">January</option>
+                    <option value="02">February</option>
+                    <option value="03">March</option>
+                    <option value="04">April</option>
+                    <option value="05">May</option>
+                    <option value="06">June</option>
+                    <option value="07">July</option>
+                    <option value="08">August</option>
+                    <option value="09">September</option>
                     <option value="10">October</option>
                     <option value="11">November</option>
                     <option value="12">December</option>
@@ -114,8 +135,8 @@ include 'includes/menu.php'; ?>
                     <option value="2030">2030</option>
                </select>
                </span>
-               <span data-tooltip="Show records" >
-                    <button   style="background-color:#be6a15;" type="buttons" type="submit" name="show_table" class="buttonss">
+               <span data-tooltip="SHOW RECORDS" >
+                    <button   style="background-color:#be6a15;" type="buttons" id="show" type="submit" name="show_table" class="buttonss">
                      <span class="button__texts"  >SHOW</span>
                      <span class="button__icons">
                      <ion-icon name="add-circle-outline"></ion-icon>
@@ -134,16 +155,18 @@ include 'includes/menu.php'; ?>
                         <button data-close-button class="close-button">&times;</button>
                         </div>
                         <div class="modal-body">
-                        <form action="../includes/dbprocess.php" Method="POST">
+                        <form action="../includes/dbprocess.php" Method="POST" autocomplete="off">
                               
                                 <div class="input-container name combobox">
                                   
-                                <input type="date" name="date">
-                             
+                                <input type="date" name="date" id="date" required>
+                                <input type="hidden" name="Olddate" id="Olddate">
+                                <input type="hidden" name="id" id="id">
+                                <input type="hidden" name="od" id="od">
                                
 
                                 <span class="custom-dropdown big large">
-                                <select name="description">    
+                                <select name="description" id="description" required>    
                                         <option value="">Description</option>
                                         <option value="Beginning balance">Beginning balance</option> 
                                         <option value="Investment">Investment</option>  
@@ -181,12 +204,12 @@ include 'includes/menu.php'; ?>
                                 </div>
                                 <div class="radio-container">
                                         <div class="container">
-                                            <input type="radio" name="amount" id="in">
+                                            <input type="radio" name="type_of_entry" value="Inflows" id="in" required>
                                             <label for="in">Inflows</label>
                                         </div>
 
                                       <div class="container">
-                                            <input type="radio" name="amount" id="out">
+                                            <input type="radio" name="type_of_entry" value="Outflows" id="out" required>
                                             <label for="out">Outflow</label>
                                     </div>
                                 </div>
@@ -194,7 +217,7 @@ include 'includes/menu.php'; ?>
 
                                 <div class="input-container email">
                                  
-                                    <input type="text" id="inflows" name="inflows" onkeypress="return onlyNumberKey(event)"  name="outflows" placeholder="Input your amount">
+                                    <input type="text" id="amount" name="amount" onkeypress="return onlyNumberKey(event)" placeholder="Input your amount" required>
                                 </div>
                                 
                                 <div class="input-container cta">
@@ -216,19 +239,11 @@ include 'includes/menu.php'; ?>
 
                         }
 
-                        $(document).ready(function () {
-                                $('#inflows').click(function () {
-                                    
-                                    $('inflows').removeAttr('disabled');
-                                    $('#outflows').attr('disabled', 'disabled');
-                                    
-                                });
-                                $('#outflows').click(function () {
-                                     $('#outflows').removeAttr('disabled');
-                                     $('#inflows').attr('disabled', 'disabled');
-                                });
-                         });
-
+                        function setDataOnSelection(){
+                            $('#Month').val("<?php echo $_SESSION['month']?>");
+                            $('#Year').val("<?php echo $_SESSION['year']?>");
+                           
+                        }
 
                     </script>
 
@@ -240,7 +255,7 @@ include 'includes/menu.php'; ?>
                     $year = $_POST['year'];
                     $Bname = mysqli_real_escape_string($conn, $Bname);
 
-                    $query = "SELECT cbe_id, date, description, inflows, outflows, balance FROM tblcashbookentry WHERE ((MONTH(date) = '$month' AND YEAR(date)= '$year') AND (business_name = '$Bname')) ORDER BY date ASC";    
+                    $query = "SELECT cbe_id, date, order_by, description, inflows, outflows, balance FROM tblcashbookentry WHERE ((MONTH(date) = '$month' AND YEAR(date)= '$year') AND (business_name = '$Bname')) Order By date, order_by ASC";    
                     $stmt = $conn->prepare($query);
                     $stmt-> execute();
                     $result = $stmt->get_result();  
@@ -251,6 +266,7 @@ include 'includes/menu.php'; ?>
                 <tr>
                 <th hidden>ID</th>
                 <th>Date</th>
+                <th hidden>OD</th>
                 <th>Description</th>
                 <th>Inflows</th>
                 <th>Outflows</th>
@@ -263,34 +279,204 @@ include 'includes/menu.php'; ?>
                 <tr>
                 <td data-label="ID" hidden><?= $row['cbe_id'] ?></td>
                 <td data-label="Date"><?= $row['date'] ?></td>
+                <td data-label="OD" hidden><?= $row['order_by'] ?></td>
                 <td data-label="Description"><?= $row['description'] ?></td>
                 <td data-label="Inflows"> <strong>₱ </strong><?= $row['inflows'] ?></td>
                 <td data-label="Outflows"><strong>₱ </strong><?= $row['outflows'] ?></td>
                 <td data-label="Balance"><strong>₱ </strong><?= $row['balance'] ?></td>
                 <td data-label="Actions">
-                    <form action="#" class="buttons">
                     <span data-tooltip="Edit record">
-                    <button type="submit" class="button"  data-modal-target="#modal">
+                    <a href="javascripit:void(0)" class="button editData" data-modal-target="#modal">
                     <span class="button__icon">
                     <ion-icon name="add-circle-outline"></ion-icon>
                     </span>
-                    </button>
+                    </a>
                     </span>
 
                     <span data-tooltip="delete record">
-                    <button type="submit" class="button">
+                    <a href="javascripit:void(0)" class="button deleteData">
                     <span class="button__icon">
                     <ion-icon name="trash-outline"></ion-icon>
                     </span>
-                    </button>
+                    </a>
                     </span>
-                    </form>
-                
                 </td>
                 </tr>
             <?php } }?> 
             </tbody>
             </table>
+
+
+            <script>
+                    
+                        $(document).ready(function () {
+
+                            $('.button, .editData').on('click', function(e){
+
+                                    e.preventDefault();
+
+                                     $tr = $(this).closest('tr');
+                                     var data = $tr.children("td").map(function(){
+                                        return $(this).text();
+                                    }).get();
+
+                                    var id = data[0];
+                                    var date = data[1];
+                                    var od = data[2];
+                                    var description = data[3];
+                                    var inflows = data[4].substring(2);
+                                    var outflows = data[5].substring(1);
+                                    var balance = data[6].substring(1);
+
+                                        $('#id').val(id);
+                                        $('#od').val(od);
+                                        $('#date').val(date);
+                                        $("#date").prop("readonly",true);
+                                        $('#Olddate').val(date);
+                                        $('#description').val(description);
+
+                                        if(inflows == 0){
+                                            $('#amount').val(outflows);
+                                            $('#out').prop("checked", true);
+                                            $('#in').prop("checked", false);
+                                        }else{
+                                            $('#amount').val(inflows);
+                                            $('#out').prop("checked", false);
+                                            $('#in').prop("checked", true);
+                                        }
+    
+                            });
+
+
+
+                            $('#newData').on('click', function(e){
+
+                                    e.preventDefault();
+
+                                    var id = "";
+                                    var date = "";
+                                    var od = "";
+                                    var description = "";
+                                    var inflows = "";
+                                    var outflows = "";
+                                    var balance = "";
+
+                                        $('#id').val(id);
+                                        $('#od').val(od);
+                                        $('#date').val(date);
+                                        $("#date").prop("readonly",false);
+                                        $('#Olddate').val(date);
+                                        $('#description').val(description);
+                                        $('#amount').val(outflows);
+                                        $('#out').prop("checked", false);
+                                        $('#in').prop("checked", false);
+                                       
+    
+                            });
+
+
+                            $('#btnIncomeStatement').on('click', function(e){
+
+                                    e.preventDefault();
+
+                                    var whatToDo = "Income Statement";
+
+                                        $('.anoito').val(whatToDo);
+    
+                            });
+
+
+                            $('#btnCashFlow').on('click', function(e){
+
+                                    e.preventDefault();
+
+                                    var whatToDo = "Cash Flow";
+
+                                        $('.anoito').val(whatToDo);
+    
+                            });
+
+                            $('#btnPrint').on('click', function(e){
+
+                                    e.preventDefault();
+
+                                    var whatToDo = "Print";
+
+                                        $('.anoito').val(whatToDo);
+    
+                            });
+
+                            $('#btnDownload').on('click', function(e){
+
+                                    e.preventDefault();
+
+                                    var whatToDo = "Download";
+
+                                        $('.anoito').val(whatToDo);
+    
+                            });
+
+
+
+
+
+                            $('.deleteData').on('click', function(e){
+
+                                        e.preventDefault();
+
+                                        $tr = $(this).closest('tr');
+                                        var data = $tr.children("td").map(function(){
+                                        return $(this).text();
+                                        }).get();
+
+                                        var id = data[0];
+                                        
+                                        var date = data[1];
+                                        var od = data[2];
+                                        
+
+
+                                        swal({
+                                                title: "Are you sure to delete this file?",
+                                                icon: "warning",
+                                                buttons: true,
+                                                dangerMode: true,
+                                            })
+                                        .then((willDelete) => {
+                                            
+                                            if (willDelete) {
+
+                                                $.ajax({
+                                                    type: "POST",
+                                                    url: "../includes/dbprocess.php", 
+                                                    data: {
+                                                        "delete_btn":1,
+                                                        "delete_id": id,
+                                                        "delete_date": date,
+                                                        "delete_od": od,
+                                                    },
+                                                success: function(result){
+                                                    swal({
+                                                        title: "Successfully File Deleted!",
+                                                        icon: "success",
+                                                    }).then((result) => {
+                                                        location.reload();
+                                                    });
+                                                }
+                                            });
+
+                                            }   
+
+                                        });
+                                    });
+
+                            });
+
+
+</script>
+
+
+                        
 
           <div class="modal" id="modal2">
              <div class="modal-header">
@@ -298,7 +484,7 @@ include 'includes/menu.php'; ?>
                  <button data-close-button class="close-button">&times;</button>
                  </div>
              <div class="modal-body">
-                 
+   
              <div class="wrapper">
                     <input type="radio" name="select" id="option-1"  onclick="show1();">
                     <input type="radio" name="select" id="option-2" onclick="show2();">.
@@ -316,70 +502,73 @@ include 'includes/menu.php'; ?>
                         <span  class="labeled">Yearly</span>
                     </label>
             </div>
+            <form action="../includes/dbprocess.php" Method="POST" autocomplete="off"> 
                 <div id="Monthly" class="hide">
                      <div class="monthly-wrapper">
                           <span class="custom-dropdown big">
-                         <select>    
-                                <option>Month</option>
-                                <option>January</option>
-                                <option>February</option>
-                                <option>March</option>
-                                <option>April</option>
-                                <option>May</option>
-                                <option>June</option>
-                                <option>July</option>
-                                <option>August</option>
-                                <option>September</option>
-                                <option>October</option>
-                                <option>November</option>
-                                <option>December</option>      
+                        <select name="monthG" required>    
+                        <option value="">Month</option>
+                        <option value="01">January</option>
+                        <option value="02">February</option>
+                        <option value="03">March</option>
+                        <option value="04">April</option>
+                        <option value="05">May</option>
+                        <option value="06">June</option>
+                        <option value="07">July</option>
+                        <option value="08">August</option>
+                        <option value="09">September</option>
+                        <option value="10">October</option>
+                        <option value="11">November</option>
+                        <option value="12">December</option>   
                           </select>
                </span>
-
-                 
-                   
                  <div class="input-container text">
                      <label for="text">Year</label>
-                     <input type="text"  id="text" name="text"  placeholder="YEAR">
+                     <input type="text"  id="text" name="yearM"  onkeypress="return onlyNumberKey(event)" placeholder="Put year in this format : '2021'" minlength="4" maxlength="4" required >
+                     <input type = "hidden" name="whatshouldIDOM" class="anoito">
                  </div>
                  <div class="input-container cta">
-                                        <button class="signup-btn continue">GENERATE</button>
-                                </div>
+                    <button class="signup-btn continue" type="submit" name="generate-monthly">GENERATE</button>
+                </div>
+            </form>   
             </div>     
          </div>
+         <form action="../includes/dbprocess.php" Method="POST" autocomplete="off"> 
                     <div id="Quarterly" class="hide">
 
                         <span class="custom-dropdown big">
-                        <select>    
-                        <option>Quarter 1</option>
-                        <option>Quarter 2</option>
-                        <option>Quarter 3</option>
-                        <option>Quarter 4</option>
-                      
-
+                        <select name="quarterG" required>    
+                        <option value="Q1">Quarter 1 Jan-Mar</option>
+                        <option value="Q2">Quarter 2 Apr-Jun</option>
+                        <option value="Q3">Quarter 3 Jul-Sep</option>
+                        <option value="Q4">Quarter 4 Oct-Dec</option>
                         </select>
 
 
                         </span>
                         <div class="input-container text">
                             <label for="text">Year</label>
-                            <input type="text"  id="text" name="text"  placeholder="YEAR">
+                            <input type="text"  id="text" name="yearQ"  onkeypress="return onlyNumberKey(event)" placeholder="Put year in this format : '2021'" minlength="4" maxlength="4"  required>
+                            <input type = "hidden" name="whatshouldIDOQ" class="anoito">
                         </div>
                         <div class="input-container cta">
-                                        <button class="signup-btn continue">GENERATE</button>
+                                        <button class="signup-btn continue" type="submit" name="generate-quarterly">GENERATE</button>
                                 </div>
                                 
                         </div>
+        </form>            
+        <form action="../includes/dbprocess.php" Method="POST" autocomplete="off">   
                     <div id="Yearly" class="hide">
 
                     <div class="input-container text">
                      <label for="text">Year</label>
-                     <input type="text"  id="text" name="text"  placeholder="YEAR">
+                     <input type="text"  id="text" name="yearY"  onkeypress="return onlyNumberKey(event)" placeholder="Put year in this format : '2021'" minlength="4" maxlength="4"  required>
+                     <input type = "hidden" name="whatshouldIDOY" class="anoito">
                  </div>
                  <div class="input-container cta">
-                            <button class="signup-btn continue">GENERATE</button>
+                            <button class="signup-btn continue" type="submit" name="generate-yearly">GENERATE</button>
                     </div>
-                            
+        </form>    
                     </div>
                             </div>
                         </div>
