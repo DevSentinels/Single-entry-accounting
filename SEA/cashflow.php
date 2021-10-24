@@ -14,16 +14,31 @@ include 'includes/header.php';
 
 include 'includes/menu.php'; ?>
 
+            <?php 
+            if (isset($_SESSION['response']) && $_SESSION['response'] !='') { ?>
+
+            <script>
+            swal({
+                title: "<?php echo $_SESSION['response']?>",
+                icon: "<?php echo $_SESSION['res_type']?>",
+                button: "Done",
+            });
+            </script>
+        
+            <?php
+                unset($_SESSION['response']); }
+            ?>
+
 
 <body>
         <div class="title-top">
 
                 <div class="title-wrapper">
-                    <h2>MICROSOFT COMPANY</h2>
+                <h2><?php echo $_SESSION['business_name']?></h2>
                 </div>
         <div class="title-wrapper">
-                    <h2>CASHFLOW</h2>
-                    <p>for the Month ended January 31, 2021</p>
+                    <h2>STATEMENT OF CASH FLOWS</h2>
+                    <p><?php echo $_SESSION ['ISdetails']?></p>
                 </div>
         </div>
 
@@ -39,214 +54,250 @@ include 'includes/menu.php'; ?>
 
 
 
+        <?php       
+                    $month = $_SESSION['month_is'];
+                    $year = $_SESSION['year_is'];
+                    $Bname =  $_SESSION['business_name'];
+
+                    $query = "SELECT `description`, `amount`, `sign` FROM `tblcashflow` WHERE `date_month` = '$month' AND `date_year` = '$year' AND `business_name` = '$Bname' AND `category` = 'OPERATING'";    
+                    $stmt = $conn->prepare($query);
+                    $stmt-> execute();
+                    $result = $stmt->get_result();  
+                    
+        ?>  
+
         <table class="content-table income-table">
             <thead>
                 <tr>
                 <th>OPERATING</th>
                 <th>AMOUNT</th>
-              
-            
                 </tr>
             </thead>
             <tbody>
+            <?php while ($row = $result->fetch_assoc()) { ?>
                 <tr>
-               
-                <td >Supplies Expense</td>
-                <td><strong>₱</strong> 1,400</td>
+                <td><?= $row['description'] ?></td>
+                <td><strong>₱ </strong>
+                <?php 
+
+                if($row['sign'] == "negative"){
+                  echo '('.number_format($row['amount']).')'; 
+                }else{
+                  
+                  echo number_format($row['amount']); 
+                }
+                ?></td>
                 </tr>
-               
-                <tr>
-               
-                    <td >Selling and Distribution Expenses</td>
-                    <td><strong>₱</strong> 200</td>
+            <?php } ?>
 
-               </tr>
-               <tr>
-               
-                    <td >Inventory Purchases</td>
-                    <td><strong>₱</strong>444,880</td>
+            <?php       
+                    $query = "SELECT  SUM(amount) AS total_amount FROM `tblcashflow` WHERE `date_month` = '$month' AND `date_year` = '$year' AND `business_name` = '$Bname' AND `category` = 'OPERATING' AND `sign` = 'negative'";    
+                    $stmt = $conn->prepare($query);
+                    $stmt-> execute();
+                    $result = $stmt->get_result();  
 
-              </tr>
-              <tr>
-               
-                        <td >Sales</td>
-                        <td><strong>₱</strong>148,960</td>
+                    while ($row = $result->fetch_assoc()) {
+                        $totalnegative = $row['total_amount'];
+                    }
 
-               </tr>
-               <tr>
-               
-                        <td >Salaries</td>
-                        <td><strong>₱</strong>15,000</td>
+                    $query = "SELECT  SUM(amount) AS total_amount FROM `tblcashflow` WHERE `date_month` = '$month' AND `date_year` = '$year' AND `business_name` = '$Bname' AND `category` = 'OPERATING' AND `sign` = 'positive'";    
+                    $stmt = $conn->prepare($query);
+                    $stmt-> execute();
+                    $result = $stmt->get_result();  
 
-               </tr>
-
-               <tr>
-               
-                        <td >Bank Financing- Short term</td>
-                        <td><strong>₱</strong>24,000</td>
-
-               </tr>
-
-               <tr>
-               
-                        <td >Other expenses</td>
-                        <td><strong>₱</strong>1,800</td>
-
-               </tr>
-               <tr>
-               
-               <td >Marketing expenses</td>
-               <td><strong>₱</strong>2,000</td>
-
-              </tr>
-              <tr>
-                      
-                      <td >Utilities expenses</td>
-                      <td><strong>₱</strong>800</td>
-
-              </tr>
-              <tr>
-                      
-                      <td >Rent expenses</td>
-                      <td><strong>₱</strong>7,000</td>
-
-              </tr>
-              <tr>
-                      
-                      <td >Salaries</td>
-                      <td><strong>₱</strong>3,000</td>
-
-              </tr>
-              <tr>
-                      
-                      <td >Sales</td>
-                      <td><strong>₱</strong>159,000</td>
-
-              </tr>
-
-              <tr>
-                      
-                     
-                      <td >Service income</td>
-                      <td><strong>₱</strong>152,000</td>
-              </tr>
-              <tr>
-                      
-                     
-                      <td >Customer Deposit</td>
-                      <td><strong>₱</strong>3,000</td>
-              </tr>
-              <tr>
-                      
-                     
-                      <td >Loan Payment - short term</td>
-                      <td><strong>₱</strong>24,000</td>
-              </tr>
-              <tr>
-                      
-                     
-                      <td >Other income</td>
-                      <td><strong>₱</strong>15,000</td>
-              </tr>
-              <tr>
-                      
-                     
-                      <td >Insurance expense</td>
-                      <td><strong>₱</strong>15,000</td>
-              </tr>
-              <tr>
-                      
-                     
-                      <td >Miscellaneous expense</td>
-                      <td><strong>₱</strong>15,000</td>
-              </tr>
-              <tr>
-                      
-                     
-                      <td >Interest expense</td>
-                      <td><strong>₱</strong>3,000</td>
-              </tr>
-              <tr>
-                      
-                     
-                      <td >Interest income</td>
-                      <td><strong>₱</strong>3,000</td>
-              </tr>
-              <tr>
-                      
-                     
-                      <td >Admin expense</td>
-                      <td><strong>₱</strong>24,000</td>
-              </tr>
+                    while ($row = $result->fetch_assoc()) {
+                        $totalpositive = $row['total_amount'];
+                    }
+            ?>  
 
                <tr style="background-color: #a7ff83;">
                     <th style="color:  #009879; text-align:left;" class="total">Net cash provided (used) from operating activities</th>
-                    <td ><strong>₱</strong> 52,120</td>
+                    <td ><strong>₱</strong>
+                    <?php 
+                    
+                    if($totalpositive > $totalnegative){
+                      $totalOP = $totalpositive - $totalnegative;
+                      $totalOPO = $totalpositive - $totalnegative;
+                      echo number_format($totalOP);
+                    }else{
+                      $totalOP = $totalnegative - $totalpositive;
+                      $totalOPO = $totalpositive - $totalnegative;
+                      echo '('.number_format($totalOP).')';
+                    }
+                    
+                    ?></td>
            
                 </tr>
-             
-           
-                
             </tbody>
             </table>
-            <table class="content-table income-table">
+            <?php       
+                    $month = $_SESSION['month_is'];
+                    $year = $_SESSION['year_is'];
+                    $Bname =  $_SESSION['business_name'];
+
+                    $query = "SELECT `description`, `amount`, `sign` FROM `tblcashflow` WHERE `date_month` = '$month' AND `date_year` = '$year' AND `business_name` = '$Bname' AND `category` = 'INVESTING'";    
+                    $stmt = $conn->prepare($query);
+                    $stmt-> execute();
+                    $result = $stmt->get_result();  
+                    
+        ?>  
+
+        <table class="content-table income-table">
+            <thead>
+                <tr>
+                <th>INVESTING</th>
+                <th>AMOUNT</th>
+                </tr>
+            </thead>
+            <tbody>
+            <?php while ($row = $result->fetch_assoc()) { ?>
+                <tr>
+                <td><?= $row['description'] ?></td>
+                <td><strong>₱ </strong>
+                <?php 
+
+                if($row['sign'] == "negative"){
+                  echo '('.number_format($row['amount']).')'; 
+                }else{
+                  
+                  echo number_format($row['amount']); 
+                }
+                ?></td>
+                </tr>
+            <?php } ?>
+
+            <?php       
+                    $query = "SELECT  SUM(amount) AS total_amount FROM `tblcashflow` WHERE `date_month` = '$month' AND `date_year` = '$year' AND `business_name` = '$Bname' AND `category` = 'INVESTING' AND `sign` = 'negative'";    
+                    $stmt = $conn->prepare($query);
+                    $stmt-> execute();
+                    $result = $stmt->get_result();  
+
+                  
+                    while ($row = $result->fetch_assoc()) {
+                        $totalnegative = $row['total_amount'];
+                    }
+
+                    $query = "SELECT  SUM(amount) AS total_amount FROM `tblcashflow` WHERE `date_month` = '$month' AND `date_year` = '$year' AND `business_name` = '$Bname' AND `category` = 'INVESTING' AND `sign` = 'positive'";    
+                    $stmt = $conn->prepare($query);
+                    $stmt-> execute();
+                    $result = $stmt->get_result();  
+
+                    while ($row = $result->fetch_assoc()) {
+                        $totalpositive = $row['total_amount'];
+                    }
+            ?>  
+
+               <tr style="background-color: #a7ff83;">
+                    <th style="color:  #009879; text-align:left;" class="total">Net cash provided (used) from investing activities</th>
+                    <td ><strong>₱</strong>
+                    <?php 
+                    
+                    if($totalpositive > $totalnegative){
+                      $totalIN = $totalpositive - $totalnegative;
+                      $totalINO = $totalpositive - $totalnegative;
+                      echo number_format($totalIN);
+                    }else{
+                      $totalIN = $totalnegative - $totalpositive;
+                      $totalINO = $totalpositive - $totalnegative;
+                      echo '('.number_format($totalIN).')';
+                    }
+                    
+                    ?></td>
+           
+                </tr>
+            </tbody>
+            </table>
+
+            <?php       
+                    $month = $_SESSION['month_is'];
+                    $year = $_SESSION['year_is'];
+                    $Bname =  $_SESSION['business_name'];
+
+                    $query = "SELECT `description`, `amount`, `sign` FROM `tblcashflow` WHERE `date_month` = '$month' AND `date_year` = '$year' AND `business_name` = '$Bname' AND `category` = 'FINANCING'";    
+                    $stmt = $conn->prepare($query);
+                    $stmt-> execute();
+                    $result = $stmt->get_result();  
+                    
+        ?>  
+
+        <table class="content-table income-table">
             <thead>
                 <tr>
                 <th>FINANCING</th>
                 <th>AMOUNT</th>
-              
-            
                 </tr>
             </thead>
             <tbody>
+            <?php while ($row = $result->fetch_assoc()) { ?>
                 <tr>
-               
-                <td >Investment</td>
-                <td><strong>₱</strong>390,000</td>
+                <td><?= $row['description'] ?></td>
+                <td><strong>₱ </strong>
+                <?php 
+
+                if($row['sign'] == "negative"){
+                  echo '('.number_format($row['amount']).')'; 
+                }else{
+                  
+                  echo number_format($row['amount']); 
+                }
+                ?></td>
                 </tr>
-               
-                <tr>
-               
-                    <td >Other sources of cash</td>
-                    <td><strong>₱</strong>5,000</td>
+            <?php } ?>
 
-               </tr>
-               <tr>
-               
-                    <td >other uses of cash</td>
-                    <td><strong>₱</strong>20,080</td>
+            <?php       
+                    $query = "SELECT  SUM(amount) AS total_amount FROM `tblcashflow` WHERE `date_month` = '$month' AND `date_year` = '$year' AND `business_name` = '$Bname' AND `category` = 'FINANCING' AND `sign` = 'negative'";    
+                    $stmt = $conn->prepare($query);
+                    $stmt-> execute();
+                    $result = $stmt->get_result();  
 
-              </tr>
-              <tr>
-               
-                        <td >Bank financing - long term</td>
-                        <td><strong>₱</strong>137,000</td>
+                  
+                    while ($row = $result->fetch_assoc()) {
+                        $totalnegative = $row['total_amount'];
+                    }
 
-               </tr>
-               <tr>
-               
-               <td >Loan payment- long term</td>
-               <td><strong>₱</strong>137,000</td>
+                    $query = "SELECT  SUM(amount) AS total_amount FROM `tblcashflow` WHERE `date_month` = '$month' AND `date_year` = '$year' AND `business_name` = '$Bname' AND `category` = 'FINANCING' AND `sign` = 'positive'";    
+                    $stmt = $conn->prepare($query);
+                    $stmt-> execute();
+                    $result = $stmt->get_result();  
 
-           </tr>
-           <tr style="background-color: #a7ff83;">
+                    while ($row = $result->fetch_assoc()) {
+                        $totalpositive = $row['total_amount'];
+                    }
+            ?>  
+
+               <tr style="background-color: #a7ff83;">
                     <th style="color:  #009879; text-align:left;" class="total">Net cash provided (used) from financing activities</th>
-                    <td ><strong>₱</strong>374,920</td>
+                    <td ><strong>₱</strong>
+                    <?php 
+                    
+                    if($totalpositive > $totalnegative){
+                      $totalFI = $totalpositive - $totalnegative;
+                      $totalFIO = $totalpositive - $totalnegative;
+                      echo number_format($totalFI);
+                    }else{
+                      $totalFI = $totalnegative - $totalpositive;
+                      $totalFIO = $totalpositive - $totalnegative;
+                      echo '('.number_format($totalFI).')';
+                    }
+                    
+                    ?></td>
            
                 </tr>
-             
-
-
-
-    
-                
             </tbody>
             </table>
+
             <table class="content-table ">
             <thead>
                 <tr>
                 <th>NET CHANGE IN CASH</th>
-                <th><strong>₱</strong> 145,800</th>
+                <th><strong>₱</strong> <?php 
+                $netC = $totalFIO + $totalINO + $totalOPO;
+                if($netC < 0){
+                  echo '('.number_format(substr($netC,1)).')';
+                }else{
+                  echo number_format($netC);
+                }
+                ?></th>
               
             
                 </tr>
@@ -260,7 +311,14 @@ include 'includes/menu.php'; ?>
                
                 <tr style="background-color:khaki;">
                 <th style="color:  #009879; text-align:left; " class="total">CASH ENDING</th>
-                <td data-label="DATE"><strong>₱</strong> 145,800</td>
+                <td data-label="DATE"><strong>₱</strong>  <?php 
+                $netC = $totalFIO + $totalINO + $totalOPO;
+                if($netC < 0){
+                  echo '('.number_format(substr($netC,1)).')';
+                }else{
+                  echo number_format($netC);
+                }
+                ?></td>
 
                 </tr>
              
@@ -308,35 +366,31 @@ include 'includes/menu.php'; ?>
                         <span  class="labeled">Yearly</span>
                     </label>
             </div>
-
+            <form action="../includes/dbprocess.php" Method="POST" autocomplete="off"> 
             <div id="Monthly" class="hide">
                      <div class="monthly-wrapper">
                           <span class="custom-dropdown big">
-                         <select>    
-                                <option>Month</option>
-                                <option>January</option>
-                                <option>February</option>
-                                <option>March</option>
-                                <option>April</option>
-                                <option>May</option>
-                                <option>June</option>
-                                <option>July</option>
-                                <option>August</option>
-                                <option>September</option>
-                                <option>October</option>
-                                <option>November</option>
-                                <option>December</option>      
+                        <select name="monthCShow" required>    
+                        <option value="">Month</option>
+                        <option value="1">January</option>
+                        <option value="2">February</option>
+                        <option value="3">March</option>
+                        <option value="4">April</option>
+                        <option value="5">May</option>
+                        <option value="6">June</option>
+                        <option value="7">July</option>
+                        <option value="8">August</option>
+                        <option value="9">September</option>
+                        <option value="10">October</option>
+                        <option value="11">November</option>
+                        <option value="12">December</option>     
                           </select>
                </span>
-
                  
-                   
                  <div class="search">
-                    
-                     <input type="text"  id="text" name="text"  placeholder="YEAR">
-                      
+                 <input type="text"  id="text" name="yearCShow"  onkeypress="return onlyNumberKey(event)" placeholder="Put year in this format : '2021'" minlength="4" maxlength="4" required >
                       <div class="button-wrapper">
-                      <button class="buttonss views search-btn" type="submit" name="Search">
+                      <button class="buttonss views search-btn" type="submit" name="Search_Monthly_CF">
                           <span class="button__texts">FIND</span>
                           <span class="button__icons">
                           <ion-icon name="search-outline"></ion-icon>
@@ -347,27 +401,25 @@ include 'includes/menu.php'; ?>
                  
             </div>     
          </div>
+         </form>   
+         <form action="../includes/dbprocess.php" Method="POST" autocomplete="off"> 
                     <div id="Quarterly" class="hide">
 
                         <span class="custom-dropdown big">
-                        <select>    
-                        <option>Quarter 1</option>
-                        <option>Quarter 2</option>
-                        <option>Quarter 3</option>
-                        <option>Quarter 4</option>
-                      
-
+                        <select name="quarterCShow" required>    
+                        <option value="Q1">Quarter 1 Jan-Mar</option>
+                        <option value="Q2">Quarter 2 Apr-Jun</option>
+                        <option value="Q3">Quarter 3 Jul-Sep</option>
+                        <option value="Q4">Quarter 4 Oct-Dec</option>
                         </select>
-
-
                         </span>
                          
                  <div class="search">
                     
-                    <input type="text"  id="text" name="text"  placeholder="YEAR">
+                 <input type="text"  id="text" name="yearCShowQ"  onkeypress="return onlyNumberKey(event)" placeholder="Put year in this format : '2021'" minlength="4" maxlength="4" required >
                      
                      <div class="button-wrapper">
-                     <button class="buttonss views search-btn" type="submit" name="Search">
+                     <button class="buttonss views search-btn" type="submit" name="Search_Quarterly_CF">
                          <span class="button__texts">FIND</span>
                          <span class="button__icons">
                          <ion-icon name="search-outline"></ion-icon>
@@ -377,15 +429,17 @@ include 'includes/menu.php'; ?>
                 </div>
                                 
                         </div>
+                  </form>
+                  <form action="../includes/dbprocess.php" Method="POST" autocomplete="off"> 
                     <div id="Yearly" class="hide">
 
                     
                     <div class="search">
                     
-                    <input type="text"  id="text" name="text"  placeholder="YEAR">
+                    <input type="text"  id="text" name="yearCShowY"  onkeypress="return onlyNumberKey(event)" placeholder="Put year in this format : '2021'" minlength="4" maxlength="4" required >
                      
                      <div class="button-wrapper">
-                     <button class="buttonss views search-btn" type="submit" name="Search">
+                     <button class="buttonss views search-btn" type="submit" name="Search_Yearly_CF">
                          <span class="button__texts">FIND</span>
                          <span class="button__icons">
                          <ion-icon name="search-outline"></ion-icon>
@@ -396,61 +450,14 @@ include 'includes/menu.php'; ?>
                     </div>
 
               </div>          
+                  </form>
 
-
-    <div class="row">
-     
-      <div class="card">
-        <div class="card-header">
-          <h1>CF 01/21</h1>
-        </div>
-        <div class="card-body">
-          <p>
-           
-          </p>
-          <a href="#" class="btn">VIEW</a>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-header">
-        <h1>CF 01/21</h1>
-        </div>
-        <div class="card-body">
-          <p>
-           
-          </p>
-          <a href="#" class="btn">VIEW</a>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-header">
-        <h1>CF 01/21</h1>
-        </div>
-        <div class="card-body">
-          <p>
-           
-          </p>
-          <a href="#" class="btn">VIEW</a>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-header">
-        <h1>CF 01/21</h1>
-        </div>
-        <div class="card-body">
-          <p>
-           
-          </p>
-          <a href="#" class="btn">VIEW</a>
-        </div>
-      </div>
-    </div>
+    
   </div>
 
   </div>
   <div id="overlay3"></div>
 
-  <div class="space" style="height: 100px;"></div>
 
 
 

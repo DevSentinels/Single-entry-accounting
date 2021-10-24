@@ -101,7 +101,8 @@ include 'includes/menu.php';
 
 
 <div class="dropdown">
-<form Method="POST">
+
+<form action="../includes/dbprocess.php" Method="POST">
           <span class="custom-dropdown big">
                <select id="Month" name="month">    
                     <option value="">Month</option>
@@ -250,9 +251,9 @@ include 'includes/menu.php';
 
             <div id="overlay"></div>
             <?php       
-                    if(isset($_POST['show_table'])){
-                    $month = $_POST['month'];
-                    $year = $_POST['year'];
+                         
+                    $month = $_SESSION['month'];
+                    $year = $_SESSION['year'];
                     $Bname = mysqli_real_escape_string($conn, $Bname);
 
                     $query = "SELECT cbe_id, date, order_by, description, inflows, outflows, balance FROM tblcashbookentry WHERE ((MONTH(date) = '$month' AND YEAR(date)= '$year') AND (business_name = '$Bname')) Order By date, order_by ASC";    
@@ -302,7 +303,7 @@ include 'includes/menu.php';
                     </span>
                 </td>
                 </tr>
-            <?php } }?> 
+            <?php }?> 
             </tbody>
             </table>
 
@@ -508,19 +509,19 @@ include 'includes/menu.php';
                           <span class="custom-dropdown big">
                         <select name="monthG" required>    
                         <option value="">Month</option>
-                        <option value="01">January</option>
-                        <option value="02">February</option>
-                        <option value="03">March</option>
-                        <option value="04">April</option>
-                        <option value="05">May</option>
-                        <option value="06">June</option>
-                        <option value="07">July</option>
-                        <option value="08">August</option>
-                        <option value="09">September</option>
+                        <option value="1">January</option>
+                        <option value="2">February</option>
+                        <option value="3">March</option>
+                        <option value="4">April</option>
+                        <option value="5">May</option>
+                        <option value="6">June</option>
+                        <option value="7">July</option>
+                        <option value="8">August</option>
+                        <option value="9">September</option>
                         <option value="10">October</option>
                         <option value="11">November</option>
                         <option value="12">December</option>   
-                          </select>
+                        </select>
                </span>
                  <div class="input-container text">
                      <label for="text">Year</label>

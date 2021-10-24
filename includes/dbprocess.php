@@ -76,6 +76,11 @@ if(isset($_POST['login_btn'])){
             $_SESSION ['first'] = true;
             $_SESSION ['year'] = date("Y");
             $_SESSION ['month']= date("m");
+            $_SESSION ['year_is'] = date("Y");
+            $_SESSION ['month_is']= date("m");
+            $date = DateTime::createFromFormat('Y-m-d', $_SESSION ['year_is'].'-'. $_SESSION ['month_is'].'-30');
+            $ISdetails = 'for the Month ended ' . $date->format('F d, Y');
+            $_SESSION ['ISdetails']= $ISdetails;
             $_SESSION ['res_type']= "success";
             
 
@@ -86,6 +91,20 @@ if(isset($_POST['login_btn'])){
         }
 
 }
+
+
+if(isset($_POST['show_table'])){
+
+    $month = $_POST['month'];
+    $year = $_POST['year'];
+
+
+    header("Location: ../SEA/cashbook.php");
+    $_SESSION ['year'] = $year;
+    $_SESSION ['month']= $month;
+
+}
+
 
 //Add and Edit Entry on Cashbook 
 
@@ -645,9 +664,300 @@ if(isset($_POST['generate-monthly'])){
 
     if($WhatWillGenerate == "Income Statement"){
 
+        
+
+        $sqlforupdateaccount="DELETE FROM `tblincomestatement` WHERE `date_month` = ? AND `date_year` = ? AND `business_name` = ?";
+
+        $stmt = mysqli_stmt_init($conn);
+    
+            
+            if(!mysqli_stmt_prepare($stmt, $sqlforupdateaccount)){
+                echo "SQL Error";
+            }else{
+                mysqli_stmt_bind_param($stmt,"sss",$Month,$Year,$BusinessName);
+                mysqli_stmt_execute($stmt);
+            }
+
+        
+
+
+        $sqlforNoAccount = "SELECT cbe_id FROM tblcashbookentry WHERE ((MONTH(date) = '$Month' AND YEAR(date)= '$Year') AND (business_name = '$BusinessName')) Order By date, order_by ASC";
+        $stmt = $conn->prepare($sqlforNoAccount);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+
+        $IDS = array();
+
+        $counter = 0;
+        while ($row = $result->fetch_assoc()) {
+        $IDS[$counter] = $row['cbe_id'];
+        $counter++;
+        }
+
+        $numberNeedUpdate = count($IDS);
+
+
+        for ($i=0; $i < $numberNeedUpdate ; $i++) { 
+            # code...
+    
+            $sqlforNoAccount = "SELECT date, description, inflows, outflows FROM tblcashbookentry WHERE cbe_id = '$IDS[$i]'";
+            $stmt = $conn->prepare($sqlforNoAccount);
+            $stmt->execute();
+            $result = $stmt->get_result();
+        
+            while ($row = $result->fetch_assoc()) {
+                
+                    $update_description = $row['description'];
+                    $update_inflows = $row['inflows'];
+                    $update_outflows = $row['outflows'];
+                    $last_date = $row['date'];
+            }
+
+    
+            if($update_inflows == "0"){
+                $amount = $update_outflows;
+                $category= 'EXPENSES';
+            }else{
+                $amount = $update_inflows;
+                $category= 'INCOME';
+            }
+            
+            $type= 'Monthly';
+
+
+            $sqlforNoAccount = "SELECT is_id, amount FROM tblincomestatement WHERE date_month = '$Month' AND date_year = '$Year' AND business_name = '$BusinessName' AND description='$update_description'";
+            $sqlrun = mysqli_query($conn, $sqlforNoAccount);
+    
+            if(mysqli_num_rows($sqlrun)>0){
+            
+                $stmt = $conn->prepare($sqlforNoAccount);
+                $stmt->execute();
+                $result = $stmt->get_result();
+    
+                while ($row = $result->fetch_assoc()) {
+                    $id = $row['is_id']; 
+                    $prev_amount = $row['amount'];
+                }
+
+                $amount = $prev_amount + $amount;
+
+                $sqlforAccounts = "UPDATE tblincomestatement SET amount='$amount' WHERE is_id = ?";
+                
+                $stmt = mysqli_stmt_init($conn);
+        
+                if(!mysqli_stmt_prepare($stmt, $sqlforAccounts)){
+                    echo "SQL Error";
+                }else{
+                    mysqli_stmt_bind_param($stmt,"s",$id);
+                    mysqli_stmt_execute($stmt);
+                }
+
+            }else{
+
+
+                $sqlforAccounts = "INSERT INTO tblincomestatement(is_id,business_name, date_month, date_year, type, category, description, amount,details) VALUES ('',?,?,?,?,?,?,?,'');";
+            
+                $stmt = mysqli_stmt_init($conn);
+        
+                if(!mysqli_stmt_prepare($stmt, $sqlforAccounts)){
+                    echo "SQL Error";
+                }else{
+                    mysqli_stmt_bind_param($stmt,"sssssss",$BusinessName,$Month,$Year,$type,$category,$update_description,$amount);
+                    mysqli_stmt_execute($stmt);
+                }
+            }
+        }
+
+        $date = DateTime::createFromFormat('Y-m-d', $last_date);
+
+        
+
+        $ISdetails = 'for the Month ended ' . $date->format('F d, Y');
+
+        $sqlforAccounts = "UPDATE tblincomestatement SET details='$ISdetails' WHERE `date_month` = ? AND `date_year` = ? AND `business_name` = ?";
+                
+                $stmt = mysqli_stmt_init($conn);
+        
+                if(!mysqli_stmt_prepare($stmt, $sqlforAccounts)){
+                    echo "SQL Error";
+                }else{
+                    mysqli_stmt_bind_param($stmt,"sss",$Month,$Year,$BusinessName);
+                    mysqli_stmt_execute($stmt);
+                }
+
+
+
+
+
+
+        header("Location: ../SEA/income.php");
+        $_SESSION ['response'] = "Successfully Income Statement Generated";
+        $_SESSION ['res_type']= "success";
+        $_SESSION ['year_is'] = $Year;
+        $_SESSION ['month_is']= $Month;
+        $_SESSION ['ISdetails']= $ISdetails;
+
 
     }
     else if($WhatWillGenerate == "Cash Flow"){
+
+
+        $sqlforupdateaccount="DELETE FROM `tblcashflow` WHERE `date_month` = ? AND `date_year` = ? AND `business_name` = ?";
+
+        $stmt = mysqli_stmt_init($conn);
+    
+            
+            if(!mysqli_stmt_prepare($stmt, $sqlforupdateaccount)){
+                echo "SQL Error";
+            }else{
+                mysqli_stmt_bind_param($stmt,"sss",$Month,$Year,$BusinessName);
+                mysqli_stmt_execute($stmt);
+            }
+
+
+            $sqlforNoAccount = "SELECT cbe_id FROM tblcashbookentry WHERE ((MONTH(date) = '$Month' AND YEAR(date)= '$Year') AND (business_name = '$BusinessName')) Order By date, order_by ASC";
+            $stmt = $conn->prepare($sqlforNoAccount);
+            $stmt->execute();
+            $result = $stmt->get_result();
+    
+    
+            $IDS = array();
+    
+            $counter = 0;
+            while ($row = $result->fetch_assoc()) {
+            $IDS[$counter] = $row['cbe_id'];
+            $counter++;
+            }
+    
+            $numberNeedUpdate = count($IDS);
+    
+    
+            for ($i=0; $i < $numberNeedUpdate ; $i++) { 
+                # code...
+        
+                $sqlforNoAccount = "SELECT date, description, inflows, outflows FROM tblcashbookentry WHERE cbe_id = '$IDS[$i]'";
+                $stmt = $conn->prepare($sqlforNoAccount);
+                $stmt->execute();
+                $result = $stmt->get_result();
+            
+                while ($row = $result->fetch_assoc()) {
+                    
+                        $update_description = $row['description'];
+                        $update_inflows = $row['inflows'];
+                        $update_outflows = $row['outflows'];
+                        $last_date = $row['date'];
+                }
+    
+        
+                if($update_inflows == "0"){
+                    $amount = $update_outflows;
+                    $sign= 'negative';
+                }else{
+                    $amount = $update_inflows;
+                    $sign= 'positive';
+                }
+                
+                $type= 'Monthly';
+
+
+                if($update_description == "Equipment" || $update_description == "Vehicle" || $update_description == "Furniture"){
+                    $category = 'INVESTING';
+
+                }else if($update_description == "Investment" || $update_description == "Other source of cash" || $update_description == "Other Income" || $update_description == "Bank Financing Long Term" || $update_description == "Loan Payments - Long term"){
+                    $category = 'FINANCING';
+                }else{
+                    $category = 'OPERATING';
+                }
+
+
+    
+    
+                $sqlforNoAccount = "SELECT cf_id, amount FROM tblcashflow WHERE date_month = '$Month' AND date_year = '$Year' AND business_name = '$BusinessName' AND description='$update_description'";
+                $sqlrun = mysqli_query($conn, $sqlforNoAccount);
+        
+                if(mysqli_num_rows($sqlrun)>0){
+                
+                    $stmt = $conn->prepare($sqlforNoAccount);
+                    $stmt->execute();
+                    $result = $stmt->get_result();
+        
+                    while ($row = $result->fetch_assoc()) {
+                        $id = $row['cf_id']; 
+                        $prev_amount = $row['amount'];
+                    }
+    
+                    $amount = $prev_amount + $amount;
+    
+                    $sqlforAccounts = "UPDATE tblcashflow SET amount='$amount' WHERE cf_id = ?";
+                    
+                    $stmt = mysqli_stmt_init($conn);
+            
+                    if(!mysqli_stmt_prepare($stmt, $sqlforAccounts)){
+                        echo "SQL Error";
+                    }else{
+                        mysqli_stmt_bind_param($stmt,"s",$id);
+                        mysqli_stmt_execute($stmt);
+                    }
+    
+                }else{
+    
+    
+                    $sqlforAccounts = "INSERT INTO tblcashflow(cf_id,business_name, date_month, date_year, type, category, description, amount, sign,details) VALUES ('',?,?,?,?,?,?,?,?,'');";
+                
+                    $stmt = mysqli_stmt_init($conn);
+            
+                    if(!mysqli_stmt_prepare($stmt, $sqlforAccounts)){
+                        echo "SQL Error";
+                    }else{
+                        mysqli_stmt_bind_param($stmt,"ssssssss",$BusinessName,$Month,$Year,$type,$category,$update_description,$amount,$sign);
+                        mysqli_stmt_execute($stmt);
+                    }
+                }
+            }
+    
+            $date = DateTime::createFromFormat('Y-m-d', $last_date);
+    
+            
+    
+            $ISdetails = 'for the Month ended ' . $date->format('F d, Y');
+    
+            $sqlforAccounts = "UPDATE tblcashflow SET details='$ISdetails' WHERE `date_month` = ? AND `date_year` = ? AND `business_name` = ?";
+                    
+                    $stmt = mysqli_stmt_init($conn);
+            
+                    if(!mysqli_stmt_prepare($stmt, $sqlforAccounts)){
+                        echo "SQL Error";
+                    }else{
+                        mysqli_stmt_bind_param($stmt,"sss",$Month,$Year,$BusinessName);
+                        mysqli_stmt_execute($stmt);
+                    }
+    
+    
+    
+    
+    
+    
+            header("Location: ../SEA/cashflow.php");
+            $_SESSION ['response'] = "Successfully Cash Flow Statement Generated";
+            $_SESSION ['res_type']= "success";
+            $_SESSION ['year_is'] = $Year;
+            $_SESSION ['month_is']= $Month;
+            $_SESSION ['ISdetails']= $ISdetails;
+    
+    
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     }
@@ -696,8 +1006,8 @@ function headerTable()
     $this->SetFont('Arial','B',10);
     // Page number
     $this->Cell(5);
-    $this->Cell(20,10,'Date',1,0,'C');
-    $this->Cell(80,10,'Description',1,0,'C');
+    $this->Cell(22,10,'Date',1,0,'C');
+    $this->Cell(78,10,'Description',1,0,'C');
     $this->Cell(30,10,'Inflows',1,0,'C');
     $this->Cell(30,10,'Outflows',1,0,'C');
     $this->Cell(30,10,'Balance',1,0,'C');
@@ -714,8 +1024,8 @@ function queryTable($Month, $Year, $BusinessName,$conn){
 
         while ($row = $result->fetch_assoc()) {
                 $this->Cell(5);
-                $this->Cell(20,10,$row['date'],1,0,'L');
-                $this->Cell(80,10,$row['description'],1,0,'L');
+                $this->Cell(22,10,$row['date'],1,0,'L');
+                $this->Cell(78,10,$row['description'],1,0,'L');
                 $this->Cell(30,10,$row['inflows'],1,0,'C');
                 $this->Cell(30,10,$row['outflows'],1,0,'C');
                 $this->Cell(30,10,$row['balance'],1,0,'C');
@@ -725,14 +1035,14 @@ function queryTable($Month, $Year, $BusinessName,$conn){
 
 function Signatory($BusinessOwner, $BusinessName)
 {
-    $this->Ln(8);
+    $this->Ln(15);
     $this->SetFont('Arial','B',12);
     $this->Cell(15);
-    $this->Cell(30,10,$BusinessOwner,0,0,'C');
+    $this->Cell(0,10,$BusinessOwner,0,0,'R');
     $this->Ln(6);
     $this->Cell(15);
     $this->SetFont('Arial','B',12);
-    $this->Cell(30,10,$BusinessName .', Owner',0,0,'C');
+    $this->Cell(0,10,$BusinessName .', Owner',0,0,'R');
     // Line break
     $this->Ln(20);
 }
@@ -743,7 +1053,7 @@ function Month($MonthDetails, $Year)
     $this->Ln(8);
     $this->SetFont('Arial','B',12);
     $this->Cell(15);
-    $this->Cell(30,10,'Month of '.$MonthDetails . ' ' . $Year,0,0,'C');
+    $this->Cell(0,10,'Month of '.$MonthDetails . ' ' . $Year,0,0,'C');
     // Line break
     $this->Ln(10);
 }
@@ -894,10 +1204,297 @@ if(isset($_POST['generate-quarterly'])){
 
     if($WhatWillGenerate == "Income Statement"){
 
+        $sqlforupdateaccount="DELETE FROM `tblincomestatement` WHERE `date_month` = ? AND `date_year` = ? AND `business_name` = ?";
+
+        $stmt = mysqli_stmt_init($conn);
+    
+            
+            if(!mysqli_stmt_prepare($stmt, $sqlforupdateaccount)){
+                echo "SQL Error";
+            }else{
+                mysqli_stmt_bind_param($stmt,"sss",$Quarter,$Year,$BusinessName);
+                mysqli_stmt_execute($stmt);
+            }
+
+
+        $sqlforNoAccount = "SELECT cbe_id FROM tblcashbookentry WHERE ((MONTH(date) >= '$Months[0]' AND MONTH(date) <= '$Months[2]') AND (YEAR(date)= '$Year' AND business_name = '$BusinessName')) Order By date, order_by ASC";
+        $stmt = $conn->prepare($sqlforNoAccount);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+
+        $IDS = array();
+
+        $counter = 0;
+        while ($row = $result->fetch_assoc()) {
+        $IDS[$counter] = $row['cbe_id'];
+        $counter++;
+        }
+
+        $numberNeedUpdate = count($IDS);
+
+        $f = 0;
+        for ($i=0; $i < $numberNeedUpdate ; $i++) { 
+            # code...
+    
+            $sqlforNoAccount = "SELECT date, description, inflows, outflows FROM tblcashbookentry WHERE cbe_id = '$IDS[$i]'";
+            $stmt = $conn->prepare($sqlforNoAccount);
+            $stmt->execute();
+            $result = $stmt->get_result();
+        
+            while ($row = $result->fetch_assoc()) {
+
+                    $update_description = $row['description'];
+                    $update_inflows = $row['inflows'];
+                    $update_outflows = $row['outflows'];
+                    
+                    if($f == 0){
+                        $first_date = $row['date'];
+                        $f++;
+                    }else{
+                        $last_date = $row['date'];
+                    }
+
+            }
+
+    
+            if($update_inflows == "0"){
+                $amount = $update_outflows;
+                $category= 'EXPENSES';
+            }else{
+                $amount = $update_inflows;
+                $category= 'INCOME';
+            }
+            
+            $type= 'Quarterly';
+
+
+            $sqlforNoAccount = "SELECT is_id, amount FROM tblincomestatement WHERE date_month = '$Quarter' AND date_year = '$Year' AND business_name = '$BusinessName' AND description='$update_description'";
+            $sqlrun = mysqli_query($conn, $sqlforNoAccount);
+    
+            if(mysqli_num_rows($sqlrun)>0){
+            
+                $stmt = $conn->prepare($sqlforNoAccount);
+                $stmt->execute();
+                $result = $stmt->get_result();
+    
+                while ($row = $result->fetch_assoc()) {
+                    $id = $row['is_id']; 
+                    $prev_amount = $row['amount'];
+                }
+
+                $amount = $prev_amount + $amount;
+
+                $sqlforAccounts = "UPDATE tblincomestatement SET amount='$amount' WHERE is_id = ?";
+                
+                $stmt = mysqli_stmt_init($conn);
+        
+                if(!mysqli_stmt_prepare($stmt, $sqlforAccounts)){
+                    echo "SQL Error";
+                }else{
+                    mysqli_stmt_bind_param($stmt,"s",$id);
+                    mysqli_stmt_execute($stmt);
+                }
+
+            }else{
+
+
+                $sqlforAccounts = "INSERT INTO tblincomestatement(is_id,business_name, date_month, date_year, type, category, description, amount) VALUES ('',?,?,?,?,?,?,?);";
+            
+                $stmt = mysqli_stmt_init($conn);
+        
+                if(!mysqli_stmt_prepare($stmt, $sqlforAccounts)){
+                    echo "SQL Error";
+                }else{
+                    mysqli_stmt_bind_param($stmt,"sssssss",$BusinessName,$Quarter,$Year,$type,$category,$update_description,$amount);
+                    mysqli_stmt_execute($stmt);
+                }
+            }
+        }
+
+
+        $date1 = DateTime::createFromFormat('Y-m-d', $first_date);
+        $date2 = DateTime::createFromFormat('Y-m-d', $last_date);
+
+        
+
+        $ISdetails = 'for the Quarter started '. $date1->format('F d') . ' ended ' . $date2->format('F d, Y');
+
+        $sqlforAccounts = "UPDATE tblincomestatement SET details='$ISdetails' WHERE `date_month` = ? AND `date_year` = ? AND `business_name` = ?";
+                
+        $stmt = mysqli_stmt_init($conn);
+
+        if(!mysqli_stmt_prepare($stmt, $sqlforAccounts)){
+            echo "SQL Error";
+        }else{
+            mysqli_stmt_bind_param($stmt,"sss",$Quarter,$Year,$BusinessName);
+            mysqli_stmt_execute($stmt);
+        }
+
+
+
+        header("Location: ../SEA/income.php");
+        $_SESSION ['response'] = "Successfully Income Statement Generated";
+        $_SESSION ['res_type']= "success";
+        $_SESSION ['year_is'] = $Year;
+        $_SESSION ['month_is']= $Quarter;
+        $_SESSION ['ISdetails']= $ISdetails;
+
+
+
        
 
     }
     else if($WhatWillGenerate == "Cash Flow"){
+
+        $sqlforupdateaccount="DELETE FROM `tblcashflow` WHERE `date_month` = ? AND `date_year` = ? AND `business_name` = ?";
+
+        $stmt = mysqli_stmt_init($conn);
+    
+            
+            if(!mysqli_stmt_prepare($stmt, $sqlforupdateaccount)){
+                echo "SQL Error";
+            }else{
+                mysqli_stmt_bind_param($stmt,"sss",$Quarter,$Year,$BusinessName);
+                mysqli_stmt_execute($stmt);
+            }
+
+
+        $sqlforNoAccount = "SELECT cbe_id FROM tblcashbookentry WHERE ((MONTH(date) >= '$Months[0]' AND MONTH(date) <= '$Months[2]') AND (YEAR(date)= '$Year' AND business_name = '$BusinessName')) Order By date, order_by ASC";
+        $stmt = $conn->prepare($sqlforNoAccount);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+
+        $IDS = array();
+
+        $counter = 0;
+        while ($row = $result->fetch_assoc()) {
+        $IDS[$counter] = $row['cbe_id'];
+        $counter++;
+        }
+
+        $numberNeedUpdate = count($IDS);
+
+        $f = 0;
+        for ($i=0; $i < $numberNeedUpdate ; $i++) { 
+            # code...
+    
+            $sqlforNoAccount = "SELECT date, description, inflows, outflows FROM tblcashbookentry WHERE cbe_id = '$IDS[$i]'";
+            $stmt = $conn->prepare($sqlforNoAccount);
+            $stmt->execute();
+            $result = $stmt->get_result();
+        
+            while ($row = $result->fetch_assoc()) {
+
+                    $update_description = $row['description'];
+                    $update_inflows = $row['inflows'];
+                    $update_outflows = $row['outflows'];
+                    
+                    if($f == 0){
+                        $first_date = $row['date'];
+                        $f++;
+                    }else{
+                        $last_date = $row['date'];
+                    }
+
+            }
+
+    
+            if($update_inflows == "0"){
+                $amount = $update_outflows;
+                $sign= 'negative';
+            }else{
+                $amount = $update_inflows;
+                $sign= 'positive';
+            }
+            
+            $type = 'Quarterly';
+
+
+            if($update_description == "Equipment" || $update_description == "Vehicle" || $update_description == "Furniture"){
+                $category = 'INVESTING';
+
+            }else if($update_description == "Investment" || $update_description == "Other source of cash" || $update_description == "Other Income" || $update_description == "Bank Financing Long Term" || $update_description == "Loan Payments - Long term"){
+                $category = 'FINANCING';
+            }else{
+                $category = 'OPERATING';
+            }
+
+            
+
+
+            $sqlforNoAccount = "SELECT cf_id, amount FROM tblcashflow WHERE date_month = '$Quarter' AND date_year = '$Year' AND business_name = '$BusinessName' AND description='$update_description'";
+            $sqlrun = mysqli_query($conn, $sqlforNoAccount);
+    
+            if(mysqli_num_rows($sqlrun)>0){
+            
+                $stmt = $conn->prepare($sqlforNoAccount);
+                $stmt->execute();
+                $result = $stmt->get_result();
+    
+                while ($row = $result->fetch_assoc()) {
+                    $id = $row['cf_id']; 
+                    $prev_amount = $row['amount'];
+                }
+
+                $amount = $prev_amount + $amount;
+
+                $sqlforAccounts = "UPDATE tblcashflow SET amount='$amount' WHERE is_id = ?";
+                
+                $stmt = mysqli_stmt_init($conn);
+        
+                if(!mysqli_stmt_prepare($stmt, $sqlforAccounts)){
+                    echo "SQL Error";
+                }else{
+                    mysqli_stmt_bind_param($stmt,"s",$id);
+                    mysqli_stmt_execute($stmt);
+                }
+
+            }else{
+
+
+                $sqlforAccounts = "INSERT INTO tblcashflow(cf_id, business_name, date_month, date_year, type, category, description, amount, sign, details) VALUES ('',?,?,?,?,?,?,?,?,'');";
+            
+                $stmt = mysqli_stmt_init($conn);
+        
+                if(!mysqli_stmt_prepare($stmt, $sqlforAccounts)){
+                    echo "SQL Error";
+                }else{
+                    mysqli_stmt_bind_param($stmt,"ssssssss",$BusinessName,$Quarter,$Year,$type,$category,$update_description,$amount,$sign);
+                    mysqli_stmt_execute($stmt);
+                }
+            }
+        }
+
+
+        $date1 = DateTime::createFromFormat('Y-m-d', $first_date);
+        $date2 = DateTime::createFromFormat('Y-m-d', $last_date);
+
+        
+
+        $ISdetails = 'for the Quarter started '. $date1->format('F d') . ' ended ' . $date2->format('F d, Y');
+
+        $sqlforAccounts = "UPDATE tblcashflow SET details='$ISdetails' WHERE `date_month` = ? AND `date_year` = ? AND `business_name` = ?";
+                
+        $stmt = mysqli_stmt_init($conn);
+
+        if(!mysqli_stmt_prepare($stmt, $sqlforAccounts)){
+            echo "SQL Error";
+        }else{
+            mysqli_stmt_bind_param($stmt,"sss",$Quarter,$Year,$BusinessName);
+            mysqli_stmt_execute($stmt);
+        }
+
+
+
+        header("Location: ../SEA/cashflow.php");
+        $_SESSION ['response'] = "Successfully Cash Flows Statement Generated";
+        $_SESSION ['res_type']= "success";
+        $_SESSION ['year_is'] = $Year;
+        $_SESSION ['month_is']= $Quarter;
+        $_SESSION ['ISdetails']= $ISdetails;
+
 
         
 
@@ -922,7 +1519,7 @@ function Header()
     $this->Ln(10);
     // Title
     $this->Cell(100);
-    $this->Cell(10,10,'CASHBOOK ENTRY RECORDS',0,0,'C');
+    $this->Cell(0,10,'CASHBOOK ENTRY RECORDS',0,0,'C');
     $this->Ln(7);
     // Line break
     $this->Ln(10);
@@ -947,8 +1544,8 @@ function headerTable()
     $this->SetFont('Arial','B',10);
     // Page number
     $this->Cell(5);
-    $this->Cell(20,10,'Date',1,0,'C');
-    $this->Cell(80,10,'Description',1,0,'C');
+    $this->Cell(22,10,'Date',1,0,'C');
+    $this->Cell(78,10,'Description',1,0,'C');
     $this->Cell(30,10,'Inflows',1,0,'C');
     $this->Cell(30,10,'Outflows',1,0,'C');
     $this->Cell(30,10,'Balance',1,0,'C');
@@ -965,8 +1562,8 @@ function queryTable($Month, $Year, $BusinessName,$conn){
 
         while ($row = $result->fetch_assoc()) {
                 $this->Cell(5);
-                $this->Cell(20,10,$row['date'],1,0,'L');
-                $this->Cell(80,10,$row['description'],1,0,'L');
+                $this->Cell(22,10,$row['date'],1,0,'L');
+                $this->Cell(78,10,$row['description'],1,0,'L');
                 $this->Cell(30,10,$row['inflows'],1,0,'C');
                 $this->Cell(30,10,$row['outflows'],1,0,'C');
                 $this->Cell(30,10,$row['balance'],1,0,'C');
@@ -976,14 +1573,14 @@ function queryTable($Month, $Year, $BusinessName,$conn){
 
 function Signatory($BusinessOwner, $BusinessName)
 {
-    $this->Ln(8);
+    $this->Ln(15);
     $this->SetFont('Arial','B',12);
     $this->Cell(15);
-    $this->Cell(30,10,$BusinessOwner,0,0,'C');
+    $this->Cell(0,10,$BusinessOwner,0,0,'R');
     $this->Ln(6);
     $this->Cell(15);
     $this->SetFont('Arial','B',12);
-    $this->Cell(30,10,$BusinessName .', Owner',0,0,'C');
+    $this->Cell(0,10,$BusinessName .', Owner',0,0,'R');
     // Line break
     $this->Ln(20);
 }
@@ -994,7 +1591,7 @@ function Month($MonthDetails, $Year)
     $this->Ln(8);
     $this->SetFont('Arial','B',12);
     $this->Cell(15);
-    $this->Cell(30,10,'Month of '.$MonthDetails . ' ' . $Year,0,0,'C');
+    $this->Cell(0,10,'Month of '.$MonthDetails . ' ' . $Year,0,0,'C');
     // Line break
     $this->Ln(10);
 }
@@ -1154,12 +1751,301 @@ if(isset($_POST['generate-yearly'])){
 
     if($WhatWillGenerate == "Income Statement"){
 
+        $sqlforupdateaccount="DELETE FROM `tblincomestatement` WHERE `date_month` = ? AND `date_year` = ? AND `business_name` = ?";
+
+        $stmt = mysqli_stmt_init($conn);
+    
+            
+            if(!mysqli_stmt_prepare($stmt, $sqlforupdateaccount)){
+                echo "SQL Error";
+            }else{
+                mysqli_stmt_bind_param($stmt,"sss",$Year,$Year,$BusinessName);
+                mysqli_stmt_execute($stmt);
+            }
+
+
+        $sqlforNoAccount = "SELECT cbe_id FROM tblcashbookentry WHERE ((MONTH(date) >= '$Months[0]' AND MONTH(date) <= '$Months[12]') AND (YEAR(date)= '$Year' AND business_name = '$BusinessName')) Order By date, order_by ASC";
+        $stmt = $conn->prepare($sqlforNoAccount);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+
+        $IDS = array();
+
+        $counter = 0;
+        while ($row = $result->fetch_assoc()) {
+        $IDS[$counter] = $row['cbe_id'];
+        $counter++;
+        }
+
+        $numberNeedUpdate = count($IDS);
+
+        $f = 0;
+        for ($i=0; $i < $numberNeedUpdate ; $i++) { 
+            # code...
+    
+            $sqlforNoAccount = "SELECT date, description, inflows, outflows FROM tblcashbookentry WHERE cbe_id = '$IDS[$i]'";
+            $stmt = $conn->prepare($sqlforNoAccount);
+            $stmt->execute();
+            $result = $stmt->get_result();
+        
+            while ($row = $result->fetch_assoc()) {
+
+                    $update_description = $row['description'];
+                    $update_inflows = $row['inflows'];
+                    $update_outflows = $row['outflows'];
+                    
+                    if($f == 0){
+                        $first_date = $row['date'];
+                        $f++;
+                    }else{
+                        $last_date = $row['date'];
+                    }
+
+            }
+
+    
+            if($update_inflows == "0"){
+                $amount = $update_outflows;
+                $category= 'EXPENSES';
+            }else{
+                $amount = $update_inflows;
+                $category= 'INCOME';
+            }
+            
+            $type= 'Yearly';
+
+
+            $sqlforNoAccount = "SELECT is_id, amount FROM tblincomestatement WHERE date_month = '$Year' AND date_year = '$Year' AND business_name = '$BusinessName' AND description='$update_description'";
+            $sqlrun = mysqli_query($conn, $sqlforNoAccount);
+    
+            if(mysqli_num_rows($sqlrun)>0){
+            
+                $stmt = $conn->prepare($sqlforNoAccount);
+                $stmt->execute();
+                $result = $stmt->get_result();
+    
+                while ($row = $result->fetch_assoc()) {
+                    $id = $row['is_id']; 
+                    $prev_amount = $row['amount'];
+                }
+
+                $amount = $prev_amount + $amount;
+
+                $sqlforAccounts = "UPDATE tblincomestatement SET amount='$amount' WHERE is_id = ?";
+                
+                $stmt = mysqli_stmt_init($conn);
+        
+                if(!mysqli_stmt_prepare($stmt, $sqlforAccounts)){
+                    echo "SQL Error";
+                }else{
+                    mysqli_stmt_bind_param($stmt,"s",$id);
+                    mysqli_stmt_execute($stmt);
+                }
+
+            }else{
+
+
+                $sqlforAccounts = "INSERT INTO tblincomestatement(is_id,business_name, date_month, date_year, type, category, description, amount) VALUES ('',?,?,?,?,?,?,?);";
+            
+                $stmt = mysqli_stmt_init($conn);
+        
+                if(!mysqli_stmt_prepare($stmt, $sqlforAccounts)){
+                    echo "SQL Error";
+                }else{
+                    mysqli_stmt_bind_param($stmt,"sssssss",$BusinessName,$Year,$Year,$type,$category,$update_description,$amount);
+                    mysqli_stmt_execute($stmt);
+                }
+            }
+        }
+
+
+        $date1 = DateTime::createFromFormat('Y-m-d', $first_date);
+        $date2 = DateTime::createFromFormat('Y-m-d', $last_date);
+
+        
+
+        $ISdetails = 'for the Year started '. $date1->format('F d') . ' ended ' . $date2->format('F d, Y');
+
+        $sqlforAccounts = "UPDATE tblincomestatement SET details='$ISdetails' WHERE `date_month` = ? AND `date_year` = ? AND `business_name` = ?";
+                
+        $stmt = mysqli_stmt_init($conn);
+
+        if(!mysqli_stmt_prepare($stmt, $sqlforAccounts)){
+            echo "SQL Error";
+        }else{
+            mysqli_stmt_bind_param($stmt,"sss",$Year,$Year,$BusinessName);
+            mysqli_stmt_execute($stmt);
+        }
+
+
+
+
+        header("Location: ../SEA/income.php");
+        $_SESSION ['response'] = "Successfully Income Statement Generated";
+        $_SESSION ['res_type']= "success";
+        $_SESSION ['year_is'] = $Year;
+        $_SESSION ['month_is']= $Year;
+        $_SESSION ['ISdetails']= $ISdetails;
+
+
+
+       
+
+    
+
       
 
     }
     else if($WhatWillGenerate == "Cash Flow"){
 
+        $sqlforupdateaccount="DELETE FROM `tblcashflow` WHERE `date_month` = ? AND `date_year` = ? AND `business_name` = ?";
+
+        $stmt = mysqli_stmt_init($conn);
+    
+            
+            if(!mysqli_stmt_prepare($stmt, $sqlforupdateaccount)){
+                echo "SQL Error";
+            }else{
+                mysqli_stmt_bind_param($stmt,"sss",$Year,$Year,$BusinessName);
+                mysqli_stmt_execute($stmt);
+            }
+
+
+        $sqlforNoAccount = "SELECT cbe_id FROM tblcashbookentry WHERE ((MONTH(date) >= '$Months[0]' AND MONTH(date) <= '$Months[12]') AND (YEAR(date)= '$Year' AND business_name = '$BusinessName')) Order By date, order_by ASC";
+        $stmt = $conn->prepare($sqlforNoAccount);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+
+        $IDS = array();
+
+        $counter = 0;
+        while ($row = $result->fetch_assoc()) {
+        $IDS[$counter] = $row['cbe_id'];
+        $counter++;
+        }
+
+        $numberNeedUpdate = count($IDS);
+
+        $f = 0;
+        for ($i=0; $i < $numberNeedUpdate ; $i++) { 
+            # code...
+    
+            $sqlforNoAccount = "SELECT date, description, inflows, outflows FROM tblcashbookentry WHERE cbe_id = '$IDS[$i]'";
+            $stmt = $conn->prepare($sqlforNoAccount);
+            $stmt->execute();
+            $result = $stmt->get_result();
         
+            while ($row = $result->fetch_assoc()) {
+
+                    $update_description = $row['description'];
+                    $update_inflows = $row['inflows'];
+                    $update_outflows = $row['outflows'];
+                    
+                    if($f == 0){
+                        $first_date = $row['date'];
+                        $f++;
+                    }else{
+                        $last_date = $row['date'];
+                    }
+
+            }
+
+    
+            if($update_inflows == "0"){
+                $amount = $update_outflows;
+                $sign= 'negative';
+            }else{
+                $amount = $update_inflows;
+                $sign= 'positive';
+            }
+            
+            $type = 'Yearly';
+
+
+            if($update_description == "Equipment" || $update_description == "Vehicle" || $update_description == "Furniture"){
+                $category = 'INVESTING';
+
+            }else if($update_description == "Investment" || $update_description == "Other source of cash" || $update_description == "Other Income" || $update_description == "Bank Financing Long Term" || $update_description == "Loan Payments - Long term"){
+                $category = 'FINANCING';
+            }else{
+                $category = 'OPERATING';
+            }
+            
+
+
+            $sqlforNoAccount = "SELECT cf_id, amount FROM tblcashflow WHERE date_month = '$Year' AND date_year = '$Year' AND business_name = '$BusinessName' AND description='$update_description'";
+            $sqlrun = mysqli_query($conn, $sqlforNoAccount);
+    
+            if(mysqli_num_rows($sqlrun)>0){
+            
+                $stmt = $conn->prepare($sqlforNoAccount);
+                $stmt->execute();
+                $result = $stmt->get_result();
+    
+                while ($row = $result->fetch_assoc()) {
+                    $id = $row['cf_id']; 
+                    $prev_amount = $row['amount'];
+                }
+
+                $amount = $prev_amount + $amount;
+
+                $sqlforAccounts = "UPDATE tblcashflow SET amount='$amount' WHERE is_id = ?";
+                
+                $stmt = mysqli_stmt_init($conn);
+        
+                if(!mysqli_stmt_prepare($stmt, $sqlforAccounts)){
+                    echo "SQL Error";
+                }else{
+                    mysqli_stmt_bind_param($stmt,"s",$id);
+                    mysqli_stmt_execute($stmt);
+                }
+
+            }else{
+
+
+                $sqlforAccounts = "INSERT INTO tblcashflow(cf_id,business_name, date_month, date_year, type, category, description, amount, sign, details) VALUES ('',?,?,?,?,?,?,?,?,'');";
+            
+                $stmt = mysqli_stmt_init($conn);
+        
+                if(!mysqli_stmt_prepare($stmt, $sqlforAccounts)){
+                    echo "SQL Error";
+                }else{
+                    mysqli_stmt_bind_param($stmt,"ssssssss",$BusinessName,$Year,$Year,$type,$category,$update_description,$amount,$sign);
+                    mysqli_stmt_execute($stmt);
+                }
+            }
+        }
+
+
+        $date1 = DateTime::createFromFormat('Y-m-d', $first_date);
+        $date2 = DateTime::createFromFormat('Y-m-d', $last_date);
+
+        
+
+        $ISdetails = 'for the Year started '. $date1->format('F d') . ' ended ' . $date2->format('F d, Y');
+
+        $sqlforAccounts = "UPDATE tblcashflow SET details='$ISdetails' WHERE `date_month` = ? AND `date_year` = ? AND `business_name` = ?";
+                
+        $stmt = mysqli_stmt_init($conn);
+
+        if(!mysqli_stmt_prepare($stmt, $sqlforAccounts)){
+            echo "SQL Error";
+        }else{
+            mysqli_stmt_bind_param($stmt,"sss",$Year,$Year,$BusinessName);
+            mysqli_stmt_execute($stmt);
+        }
+
+
+
+
+        header("Location: ../SEA/cashflow.php");
+        $_SESSION ['response'] = "Successfully Cash Flow Statement Generated";
+        $_SESSION ['res_type']= "success";
+        $_SESSION ['year_is'] = $Year;
+        $_SESSION ['month_is']= $Year;
+        $_SESSION ['ISdetails']= $ISdetails;
 
     }
     else if($WhatWillGenerate == "Print"){
@@ -1209,8 +2095,8 @@ function headerTable()
     $this->SetFont('Arial','B',10);
     // Page number
     $this->Cell(5);
-    $this->Cell(20,10,'Date',1,0,'C');
-    $this->Cell(80,10,'Description',1,0,'C');
+    $this->Cell(22,10,'Date',1,0,'C');
+    $this->Cell(78,10,'Description',1,0,'C');
     $this->Cell(30,10,'Inflows',1,0,'C');
     $this->Cell(30,10,'Outflows',1,0,'C');
     $this->Cell(30,10,'Balance',1,0,'C');
@@ -1227,8 +2113,8 @@ function queryTable($Month, $Year, $BusinessName,$conn){
 
         while ($row = $result->fetch_assoc()) {
                 $this->Cell(5);
-                $this->Cell(20,10,$row['date'],1,0,'L');
-                $this->Cell(80,10,$row['description'],1,0,'L');
+                $this->Cell(22,10,$row['date'],1,0,'L');
+                $this->Cell(78,10,$row['description'],1,0,'L');
                 $this->Cell(30,10,$row['inflows'],1,0,'C');
                 $this->Cell(30,10,$row['outflows'],1,0,'C');
                 $this->Cell(30,10,$row['balance'],1,0,'C');
@@ -1238,14 +2124,14 @@ function queryTable($Month, $Year, $BusinessName,$conn){
 
 function Signatory($BusinessOwner, $BusinessName)
 {
-    $this->Ln(8);
+    $this->Ln(15);
     $this->SetFont('Arial','B',12);
     $this->Cell(15);
-    $this->Cell(30,10,$BusinessOwner,0,0,'C');
+    $this->Cell(0,10,$BusinessOwner,0,0,'R');
     $this->Ln(6);
     $this->Cell(15);
     $this->SetFont('Arial','B',12);
-    $this->Cell(30,10,$BusinessName .', Owner',0,0,'C');
+    $this->Cell(0,10,$BusinessName .', Owner',0,0,'R');
     // Line break
     $this->Ln(20);
 }
@@ -1256,7 +2142,7 @@ function Month($MonthDetails, $Year)
     $this->Ln(8);
     $this->SetFont('Arial','B',12);
     $this->Cell(15);
-    $this->Cell(30,10,'Month of '.$MonthDetails . ' ' . $Year,0,0,'C');
+    $this->Cell(0,10,'Month of '.$MonthDetails . ' ' . $Year,0,0,'C');
     // Line break
     $this->Ln(10);
 }
@@ -1372,5 +2258,489 @@ $pdf->Output($fileName, 'D');
 
 
 
+
+}
+
+
+if(isset($_POST['print_IS'])){
+
+
+    $BusinessName = $_SESSION ['business_name'];
+    $BusinessOwner =  $_SESSION ['business_owner'];
+    $Yearly =   $_SESSION ['year_is'];
+    $Monthly = $_SESSION ['month_is'];
+    $Detailsly = $_SESSION ['ISdetails'];
+
+    $MonthDetails = array('',
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July ',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December',);
+
+
+    if($Monthly == "Q1" || $Monthly == "Q2" || $Monthly == "Q3" || $Monthly == "Q4"){
+
+        $fileName = $BusinessName .'-Income Statement '.$Monthly.'-of-'.$Yearly.'.pdf';
+
+    }else if(strlen($Monthly) == 4){
+        $fileName = $BusinessName .'-Income Statement Year-of-'.$Yearly.'.pdf';
+    }else{
+        $fileName = $BusinessName .'-Income Statement '. $MonthDetails[$Monthly] .$Yearly.'.pdf';
+    }
+
+
+                
+    class PDF extends FPDF
+    {
+    // Page header
+    function Header()
+    {
+
+        if ( $this->PageNo() === 1 ) {
+                    // Logo
+       // $this->Image('../img/logo.png',100,6,170);
+        // Arial bold 15
+        $this->SetFont('Arial','B',14);
+        // Move to the right
+        
+        $this->Ln(10);
+        // Title
+        $this->Cell(100);
+        $this->Cell(10,10,'INCOME STATEMENT',0,0,'C');
+        }
+
+    }
+    
+    // Page footer
+    function Footer()
+    {
+        // Position at 1.5 cm from bottom
+        $this->SetY(-15);
+        // Arial italic 8
+        $this->SetFont('Arial','I',8);
+        // Page number
+        $this->Cell(0,10,'Page '.$this->PageNo().'/{nb}',0,0,'C');
+    }
+    
+    // Page footer
+    function headerTable()
+    {
+        
+        
+      
+        // Arial italic 8
+        $this->SetFont('Arial','B',10);
+        // Page number
+        $this->Cell(5);
+        $this->Cell(95,10,'DESCRIPTION',1,0,'C');
+        $this->Cell(95,10,'AMOUNT',1,0,'C');
+        $this->Ln();
+    }
+    function queryTableIncome($month, $year, $BName,$conn){
+            $this->SetFont('Arial','B',10);
+           
+          
+            $sqlforNoAccount = "SELECT `description`, `amount` FROM `tblincomestatement` WHERE `date_month` = '$month' AND `date_year` = '$year' AND `business_name` = '$BName' AND `category` = 'INCOME'";
+            $stmt = $conn->prepare($sqlforNoAccount);
+            $stmt->execute();
+            $result = $stmt->get_result();
+    
+            while ($row = $result->fetch_assoc()) {
+                    $this->Cell(5);
+                    $this->Cell(95,10,$row['description'],1,0,'L');
+                    $this->Cell(95,10,number_format($row['amount']),1,0,'R');
+                    $this->Ln();
+            }
+
+            $sqlforNoAccount = "SELECT  SUM(amount) AS total_amount FROM `tblincomestatement` WHERE `date_month` = '$month' AND `date_year` = '$year' AND `business_name` = '$BName' AND `category` = 'INCOME'";
+            $stmt = $conn->prepare($sqlforNoAccount);
+            $stmt->execute();
+            $result = $stmt->get_result();
+    
+            while ($row = $result->fetch_assoc()) {
+                    $this->Cell(5);
+                    $this->Cell(95,10,'TOTAL INCOME',1,0,'L');
+                    $this->Cell(95,10,number_format($row['total_amount']),1,0,'R');
+                    $this->Ln();
+            }
+
+
+    }
+
+    function queryTableExpenses($month, $year, $BName,$conn){
+        $this->SetFont('Arial','B',10);
+       
+      
+        $sqlforNoAccount = "SELECT `description`, `amount` FROM `tblincomestatement` WHERE `date_month` = '$month' AND `date_year` = '$year' AND `business_name` = '$BName' AND `category` = 'EXPENSES'";
+        $stmt = $conn->prepare($sqlforNoAccount);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        while ($row = $result->fetch_assoc()) {
+                $this->Cell(5);
+                $this->Cell(95,10,$row['description'],1,0,'L');
+                $this->Cell(95,10,number_format($row['amount']),1,0,'R');
+                $this->Ln();
+        }
+
+        $sqlforNoAccount = "SELECT  SUM(amount) AS total_amount FROM `tblincomestatement` WHERE `date_month` = '$month' AND `date_year` = '$year' AND `business_name` = '$BName' AND `category` = 'EXPENSES'";
+        $stmt = $conn->prepare($sqlforNoAccount);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        while ($row = $result->fetch_assoc()) {
+                $totalexpenses = $row['total_amount'];
+              
+        }
+
+        $sqlforNoAccount = "SELECT  SUM(amount) AS total_amount FROM `tblincomestatement` WHERE `date_month` = '$month' AND `date_year` = '$year' AND `business_name` = '$BName' AND `category` = 'INCOME'";
+        $stmt = $conn->prepare($sqlforNoAccount);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        while ($row = $result->fetch_assoc()) {
+               $totalincome = $row['total_amount'];
+        }
+
+        $sum = $totalincome - $totalexpenses;
+
+                    if($sum < 0){
+                      $text = "NET LOSS";
+                    }else{
+                        $text = "NET PROFIT";
+                    }
+        
+
+                    $this->Cell(5);
+                    $this->Cell(95,10,"TOTAL EXPENSES",1,0,'L');
+                    $this->Cell(95,10,number_format($totalexpenses),1,0,'R');
+                    $this->Ln();
+
+                    $this->Cell(5);
+                    $this->Cell(95,10,$text,1,0,'L');
+                    $this->Cell(95,10,number_format($sum),1,0,'R');
+                    $this->Ln();
+
+
+}
+    
+    function Signatory($BusinessOwner, $BusinessName)
+    {
+        $this->Ln(15);
+        $this->SetFont('Arial','B',12);
+        $this->Cell(15);
+        $this->Cell(0,10,$BusinessOwner,0,0,'R');
+        $this->Ln(6);
+        $this->Cell(15);
+        $this->SetFont('Arial','B',12);
+        $this->Cell(0,10,$BusinessName .', Owner',0,0,'R');
+        // Line break
+        $this->Ln(20);
+    }
+
+    function subhead($ISdetails)
+{
+    $this->Ln(8);
+    $this->SetFont('Arial','B',12);
+    $this->Cell(15);
+    $this->Cell(0,10, $ISdetails ,0,0,'C');
+    // Line break
+    $this->Ln(12);
+}
+
+function subhead1($ISdetails)
+{
+    $this->Ln(8);
+    $this->SetFont('Arial','B',12);
+    $this->Cell(10);
+    $this->Cell(0,10, $ISdetails ,0,0,'C');
+    // Line break
+    $this->Ln(12);
+}
+    
+    
+    
+    }
+    
+    $pdf = new PDF();
+    $pdf->AliasNbPages();
+    $pdf->AddPage('P','Legal',0);
+
+    $pdf->subhead($Detailsly);
+
+    $pdf->subhead1("INCOME");
+    $pdf->headerTable();
+    $pdf->queryTableIncome($Monthly, $Yearly, $BusinessName,$conn);
+
+    $pdf->subhead1("EXPENSES");
+    $pdf->headerTable();
+    $pdf->queryTableExpenses($Monthly, $Yearly, $BusinessName,$conn);
+    
+    
+    $pdf->Signatory($BusinessOwner, $BusinessName);
+    $pdf->Output($fileName, 'D');
+          
+
+}
+
+
+if(isset($_POST['download_IS'])){ 
+
+    $BusinessName = $_SESSION ['business_name'];
+    $BusinessOwner =  $_SESSION ['business_owner'];
+    $Yearly =   $_SESSION ['year_is'];
+    $Monthly = $_SESSION ['month_is'];
+    $Detailsly = $_SESSION ['ISdetails'];
+
+    $MonthDetails = array('',
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July ',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December',);
+
+
+    if($Monthly == "Q1" || $Monthly == "Q2" || $Monthly == "Q3" || $Monthly == "Q4"){
+
+        $fileName = $BusinessName .'-Income Statement'.$Monthly.'-of-'.$Yearly.'.xlsx';
+        $fileName1 = $BusinessName .'-Income Statement'.$Monthly.'-of-'.$Yearly;
+
+    }else if(strlen($Monthly) == 4){
+        $fileName = $BusinessName .'-Income Statement Year-of-'.$Yearly.'.xlsx';
+        $fileName1 = $BusinessName .'-Income Statement Year-of-'.$Yearly;
+    }else{
+        $fileName = $BusinessName .'-Income Statement-'. $MonthDetails[$Monthly] .$Yearly.'.xlsx';
+         $fileName1 = $BusinessName .'-Income Statement-'. $MonthDetails[$Monthly] .$Yearly;
+    }
+
+
+
+    
+        $spreadsheet = new Spreadsheet();
+        $Excel_writer = new Xlsx($spreadsheet);
+
+
+        $spreadsheet->getProperties()->setCreator($BusinessOwner)
+        ->setLastModifiedBy($BusinessOwner)
+        ->setTitle($fileName1)
+        ->setSubject('Cashbook Entry Report')
+        ->setDescription('Cashbook Entry Report')
+        ->setKeywords('Cashbook Entry Report')
+        ->setCategory('Cashbook Entry Report');
+          
+        $spreadsheet->setActiveSheetIndex(0);
+        $activeSheet = $spreadsheet->getActiveSheet();
+          
+        $activeSheet->setCellValue('A1', 'Description');
+        $activeSheet->setCellValue('B1', 'Amount');
+
+        $activeSheet->setTitle($MonthDetails[$Monthly]);
+
+        foreach ($activeSheet->getColumnIterator() as $column) {
+            $activeSheet->getColumnDimension($column->getColumnIndex())->setAutoSize(true);
+        }
+
+        $styleArray = [
+            'font' => [
+                'bold' => true,
+            ],
+            'alignment' => [
+                'center' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+            ],
+        ];
+
+        $activeSheet->getStyle('A1:B1')->applyFromArray($styleArray);
+
+          
+        $sqlforNoAccount = "SELECT `description`, `amount` FROM `tblincomestatement` WHERE `date_month` = '$Monthly' AND `date_year` = '$Yearly' AND `business_name` = '$BusinessName' AND `category` = 'INCOME'";
+        $stmt = $conn->prepare($sqlforNoAccount);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        $i = 2;
+        while ($row = $result->fetch_assoc()) {
+                $activeSheet->setCellValue('A'.$i , number_format($row['description']));
+                $activeSheet->setCellValue('B'.$i , number_format($row['amount']));
+                $i++;
+            }
+          
+        header('Content-Type: application/vnd.ms-excel');
+        header('Content-Disposition: attachment;filename='. $fileName);
+        header('Cache-Control: max-age=0');
+        $Excel_writer->save('php://output');
+
+
+
+}
+
+
+if(isset($_POST['Search_Monthly_IS'])){
+
+    $month = $_POST['monthIShow'];
+    $year = $_POST['yearIShow'];
+    $BusinessName = $_SESSION ['business_name'];
+
+    $sqlforNoAccount = "SELECT DISTINCT details FROM `tblincomestatement` WHERE `date_month` = '$month' AND `date_year` = '$year' AND `business_name` = '$BusinessName'";
+            $stmt = $conn->prepare($sqlforNoAccount);
+            $stmt->execute();
+            $result = $stmt->get_result();
+        
+            while ($row = $result->fetch_assoc()) {
+
+                $ISdetails = $row['details'];
+
+            }
+
+
+   header("Location: ../SEA/income.php");
+    $_SESSION ['year_is'] = $year;
+    $_SESSION ['month_is']= $month;
+    $_SESSION ['ISdetails']= $ISdetails;
+
+}
+
+
+
+if(isset($_POST['Search_Quarterly_IS'])){
+
+    $month = $_POST['quarterIShow'];
+    $year = $_POST['yearIShowQ'];
+    $BusinessName = $_SESSION ['business_name'];
+
+    $sqlforNoAccount = "SELECT DISTINCT details FROM `tblincomestatement` WHERE `date_month` = '$month' AND `date_year` = '$year' AND `business_name` = '$BusinessName'";
+            $stmt = $conn->prepare($sqlforNoAccount);
+            $stmt->execute();
+            $result = $stmt->get_result();
+        
+            while ($row = $result->fetch_assoc()) {
+
+                $ISdetails = $row['details'];
+
+            }
+
+
+   header("Location: ../SEA/income.php");
+    $_SESSION ['year_is'] = $year;
+    $_SESSION ['month_is']= $month;
+    $_SESSION ['ISdetails']= $ISdetails;
+
+}
+
+
+if(isset($_POST['Search_Yearly_IS'])){
+
+    $month = $_POST['yearIShowY'];
+    $year = $_POST['yearIShowY'];
+    $BusinessName = $_SESSION ['business_name'];
+
+    $sqlforNoAccount = "SELECT DISTINCT details FROM `tblincomestatement` WHERE `date_month` = '$month' AND `date_year` = '$year' AND `business_name` = '$BusinessName'";
+            $stmt = $conn->prepare($sqlforNoAccount);
+            $stmt->execute();
+            $result = $stmt->get_result();
+        
+            while ($row = $result->fetch_assoc()) {
+
+                $ISdetails = $row['details'];
+
+            }
+
+
+   header("Location: ../SEA/income.php");
+    $_SESSION ['year_is'] = $year;
+    $_SESSION ['month_is']= $month;
+    $_SESSION ['ISdetails']= $ISdetails;
+
+}
+
+
+if(isset($_POST['Search_Monthly_CF'])){
+
+    $month = $_POST['monthCShow'];
+    $year = $_POST['yearCShow'];
+    $BusinessName = $_SESSION ['business_name'];
+
+    $sqlforNoAccount = "SELECT DISTINCT details FROM `tblincomestatement` WHERE `date_month` = '$month' AND `date_year` = '$year' AND `business_name` = '$BusinessName'";
+            $stmt = $conn->prepare($sqlforNoAccount);
+            $stmt->execute();
+            $result = $stmt->get_result();
+        
+            while ($row = $result->fetch_assoc()) {
+
+                $ISdetails = $row['details'];
+
+            }
+
+
+   header("Location: ../SEA/cashflow.php");
+    $_SESSION ['year_is'] = $year;
+    $_SESSION ['month_is']= $month;
+    $_SESSION ['ISdetails']= $ISdetails;
+
+}
+
+
+if(isset($_POST['Search_Quarterly_CF'])){
+
+    $month = $_POST['quarterCShow'];
+    $year = $_POST['yearCShowQ'];
+    $BusinessName = $_SESSION ['business_name'];
+
+    $sqlforNoAccount = "SELECT DISTINCT details FROM `tblincomestatement` WHERE `date_month` = '$month' AND `date_year` = '$year' AND `business_name` = '$BusinessName'";
+            $stmt = $conn->prepare($sqlforNoAccount);
+            $stmt->execute();
+            $result = $stmt->get_result();
+        
+            while ($row = $result->fetch_assoc()) {
+
+                $ISdetails = $row['details'];
+
+            }
+
+
+   header("Location: ../SEA/cashflow.php");
+    $_SESSION ['year_is'] = $year;
+    $_SESSION ['month_is']= $month;
+    $_SESSION ['ISdetails']= $ISdetails;
+
+}
+
+
+if(isset($_POST['Search_Yearly_CF'])){
+
+    $month = $_POST['yearCShowY'];
+    $year = $_POST['yearCShowY'];
+    $BusinessName = $_SESSION ['business_name'];
+
+    $sqlforNoAccount = "SELECT DISTINCT details FROM `tblincomestatement` WHERE `date_month` = '$month' AND `date_year` = '$year' AND `business_name` = '$BusinessName'";
+            $stmt = $conn->prepare($sqlforNoAccount);
+            $stmt->execute();
+            $result = $stmt->get_result();
+        
+            while ($row = $result->fetch_assoc()) {
+
+                $ISdetails = $row['details'];
+
+            }
+
+
+   header("Location: ../SEA/cashflow.php");
+    $_SESSION ['year_is'] = $year;
+    $_SESSION ['month_is']= $month;
+    $_SESSION ['ISdetails']= $ISdetails;
 
 }

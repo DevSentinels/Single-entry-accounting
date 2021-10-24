@@ -113,7 +113,7 @@ include 'includes/menu.php';
 
         var data = google.visualization.arrayToDataTable([
           ['INCOME STATEMENT', 'INCOME', 'EXPENSES'],
-          ['JAN', 8000, 30000],
+          ['JAN', 15000, 30000],
           ['FEB', 8000, 30000],
           ['MAR', 8000, 30000],
           ['APR', 8000, 30000],
