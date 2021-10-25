@@ -1167,13 +1167,13 @@ label{
 
 
 .modal3 {
-  overflow-y: scroll;
+ 
   position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%) scale(0);
   transition: 200ms ease-in-out;
-  height: 600px;
+  height: 370px;
   border-radius: 10px;
   z-index: 10;
   background-color: white;
@@ -1293,4 +1293,20 @@ transform: translateY(0);
     flex: 1
     ;
   }
+}
+
+.filter-wrapper{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  max-width: 100%;
+  .cta{
+  width: 500PX;
+  }
+  .big{
+    flex: 3;
+  }
+  
+  
 }

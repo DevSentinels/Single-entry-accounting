@@ -232,18 +232,12 @@ include 'includes/menu.php'; ?>
                           </select>
                </span>
                  
-                 <div class="search">
+              
                  <input type="text"  id="text" name="yearIShow"  onkeypress="return onlyNumberKey(event)" placeholder="Put year in this format : '2021'" minlength="4" maxlength="4" required >
-                      <div class="button-wrapper">
-                      <button class="buttonss views search-btn" type="submit" name="Search_Monthly_IS">
-                          <span class="button__texts">FIND</span>
-                          <span class="button__icons">
-                          <ion-icon name="search-outline"></ion-icon>
-                          </span>
-                      </button>
-                      </div>
-                 </div>
-                 
+                 <div class="input-container cta">
+                                        <button type="submit" name="Search_Monthly_IS" class="signup-btn continue">Continue</button>
+                                </div>
+               
             </div>     
          </div>
          </form>   
@@ -259,19 +253,15 @@ include 'includes/menu.php'; ?>
                         </select>
                         </span>
                          
-                 <div class="search">
+               
                     
                  <input type="text"  id="text" name="yearIShowQ"  onkeypress="return onlyNumberKey(event)" placeholder="Put year in this format : '2021'" minlength="4" maxlength="4" required >
-                     
-                     <div class="button-wrapper">
-                     <button class="buttonss views search-btn" type="submit" name="Search_Quarterly_IS">
-                         <span class="button__texts">FIND</span>
-                         <span class="button__icons">
-                         <ion-icon name="search-outline"></ion-icon>
-                         </span>
-                     </button>
-                     </div>
-                </div>
+                 <div class="input-container cta">
+                                        <button type="submit" name="Search_Quarterly_IS" class="signup-btn continue">Continue</button>
+                                </div>
+               
+                   
+               
                                 
                         </div>
                   </form>
@@ -279,21 +269,13 @@ include 'includes/menu.php'; ?>
                     <div id="Yearly" class="hide">
 
                     
-                    <div class="search">
+                  
                     
                     <input type="text"  id="text" name="yearIShowY"  onkeypress="return onlyNumberKey(event)" placeholder="Put year in this format : '2021'" minlength="4" maxlength="4" required >
-                     
-                     <div class="button-wrapper">
-                     <button class="buttonss views search-btn" type="submit" name="Search_Yearly_IS">
-                         <span class="button__texts">FIND</span>
-                         <span class="button__icons">
-                         <ion-icon name="search-outline"></ion-icon>
-                         </span>
-                     </button>
-                     </div>
-                </div>
-                    </div>
-
+                    <div class="input-container cta">
+                                        <button type="submit" name="Search_Yearly_IS" class="signup-btn continue">Continue</button>
+                                </div>
+               
               </div>          
                   </form>
 

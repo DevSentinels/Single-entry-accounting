@@ -1291,7 +1291,6 @@ label {
 }
 
 .modal3 {
-  overflow-y: scroll;
   position: fixed;
   top: 50%;
   left: 50%;
@@ -1299,7 +1298,7 @@ label {
           transform: translate(-50%, -50%) scale(0);
   -webkit-transition: 200ms ease-in-out;
   transition: 200ms ease-in-out;
-  height: 600px;
+  height: 370px;
   border-radius: 10px;
   z-index: 10;
   background-color: white;
@@ -1435,5 +1434,30 @@ label {
   -webkit-box-flex: 1;
       -ms-flex: 1;
           flex: 1;
+}
+
+.filter-wrapper {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
+  max-width: 100%;
+}
+
+.filter-wrapper .cta {
+  width: 500PX;
+}
+
+.filter-wrapper .big {
+  -webkit-box-flex: 3;
+      -ms-flex: 3;
+          flex: 3;
 }
 /*# sourceMappingURL=manager.css.map */

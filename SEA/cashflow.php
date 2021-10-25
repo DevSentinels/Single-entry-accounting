@@ -110,8 +110,8 @@ include 'includes/menu.php'; ?>
                     }
             ?>  
 
-               <tr style="background-color: #a7ff83;">
-                    <th style="color:  #009879; text-align:left;" class="total">Net cash provided (used) from operating activities</th>
+               <tr style="background-color: #F25E5E;">
+                    <th style="color:  #fff; text-align:left;" class="total">Net cash provided (used) from operating activities</th>
                     <td ><strong>₱</strong>
                     <?php 
                     
@@ -387,17 +387,12 @@ include 'includes/menu.php'; ?>
                           </select>
                </span>
                  
-                 <div class="search">
+              
                  <input type="text"  id="text" name="yearCShow"  onkeypress="return onlyNumberKey(event)" placeholder="Put year in this format : '2021'" minlength="4" maxlength="4" required >
-                      <div class="button-wrapper">
-                      <button class="buttonss views search-btn" type="submit" name="Search_Monthly_CF">
-                          <span class="button__texts">FIND</span>
-                          <span class="button__icons">
-                          <ion-icon name="search-outline"></ion-icon>
-                          </span>
-                      </button>
-                      </div>
-                 </div>
+                 <div class="input-container cta">
+                                        <button type="submit" name="Search_Monthly_CF" class="signup-btn continue">Continue</button>
+                                </div>
+              
                  
             </div>     
          </div>
@@ -414,19 +409,14 @@ include 'includes/menu.php'; ?>
                         </select>
                         </span>
                          
-                 <div class="search">
+                
                     
                  <input type="text"  id="text" name="yearCShowQ"  onkeypress="return onlyNumberKey(event)" placeholder="Put year in this format : '2021'" minlength="4" maxlength="4" required >
-                     
-                     <div class="button-wrapper">
-                     <button class="buttonss views search-btn" type="submit" name="Search_Quarterly_CF">
-                         <span class="button__texts">FIND</span>
-                         <span class="button__icons">
-                         <ion-icon name="search-outline"></ion-icon>
-                         </span>
-                     </button>
-                     </div>
-                </div>
+                 <div class="input-container cta">
+                                        <button type="submit" name="Search_Quarterly_CF" class="signup-btn continue">Continue</button>
+                                </div>
+                   
+            
                                 
                         </div>
                   </form>
@@ -434,19 +424,14 @@ include 'includes/menu.php'; ?>
                     <div id="Yearly" class="hide">
 
                     
-                    <div class="search">
+                   
                     
                     <input type="text"  id="text" name="yearCShowY"  onkeypress="return onlyNumberKey(event)" placeholder="Put year in this format : '2021'" minlength="4" maxlength="4" required >
                      
-                     <div class="button-wrapper">
-                     <button class="buttonss views search-btn" type="submit" name="Search_Yearly_CF">
-                         <span class="button__texts">FIND</span>
-                         <span class="button__icons">
-                         <ion-icon name="search-outline"></ion-icon>
-                         </span>
-                     </button>
-                     </div>
-                </div>
+                    <div class="input-container cta">
+                                        <button type="submit"  name="Search_Yearly_CF" class="signup-btn continue">Continue</button>
+                                </div>
+   
                     </div>
 
               </div>          
