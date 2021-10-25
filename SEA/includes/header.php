@@ -42,10 +42,7 @@ include_once '../includes/dbprocess.php';
                 <h5></h5>
                
             
-                <div class="header__search">
-                    <input type="search" placeholder="Search" class="header__input">
-                    <i class='bx bx-search header__icon'></i>
-                </div>
+             
     
                 <div class="header__toggle">
                     <i style="color:#fc5c9c;" class='bx bx-menu' id="header-toggle"></i>
