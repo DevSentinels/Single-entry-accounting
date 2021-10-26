@@ -59,7 +59,7 @@ include 'includes/menu.php'; ?>
                     $year = $_SESSION['year_is'];
                     $Bname =  $_SESSION['business_name'];
 
-                    $query = "SELECT `description`, `amount`, `sign` FROM `tblcashflow` WHERE `date_month` = '$month' AND `date_year` = '$year' AND `business_name` = '$Bname' AND `category` = 'OPERATING'";    
+                    $query = "SELECT `description`, `amount`, `sign`, `first_balance` FROM `tblcashflow` WHERE `date_month` = '$month' AND `date_year` = '$year' AND `business_name` = '$Bname' AND `category` = 'OPERATING'";    
                     $stmt = $conn->prepare($query);
                     $stmt-> execute();
                     $result = $stmt->get_result();  
@@ -74,7 +74,11 @@ include 'includes/menu.php'; ?>
                 </tr>
             </thead>
             <tbody>
-            <?php while ($row = $result->fetch_assoc()) { ?>
+            <?php while ($row = $result->fetch_assoc()) { 
+                        $first_balance   = $row['first_balance'];
+              
+             
+              ?>
                 <tr>
                 <td><?= $row['description'] ?></td>
                 <td><strong>₱ </strong>
@@ -110,8 +114,8 @@ include 'includes/menu.php'; ?>
                     }
             ?>  
 
-               <tr style="background-color: #F25E5E;">
-                    <th style="color:  #fff; text-align:left;" class="total">Net cash provided (used) from operating activities</th>
+               <tr style="background: #fef4a9;">
+                    <th style="color:  #009879; text-align:left;" class="total">Net cash provided (used) from operating activities</th>
                     <td ><strong>₱</strong>
                     <?php 
                     
@@ -187,7 +191,7 @@ include 'includes/menu.php'; ?>
                     }
             ?>  
 
-               <tr style="background-color: #a7ff83;">
+               <tr style="background: #fef4a9;">
                     <th style="color:  #009879; text-align:left;" class="total">Net cash provided (used) from investing activities</th>
                     <td ><strong>₱</strong>
                     <?php 
@@ -265,7 +269,7 @@ include 'includes/menu.php'; ?>
                     }
             ?>  
 
-               <tr style="background-color: #a7ff83;">
+               <tr style="background: #fef4a9;">
                     <th style="color:  #009879; text-align:left;" class="total">Net cash provided (used) from financing activities</th>
                     <td ><strong>₱</strong>
                     <?php 
@@ -306,16 +310,21 @@ include 'includes/menu.php'; ?>
                 <tr>
                
                 <td data-label="Description">CASH BEGINNING</td>
-                <td data-label="DATE"><strong>₱</strong> 0</td>
+                <td data-label="DATE"><strong>₱</strong> <?= number_format($first_balance) ?></td>
                 </tr>
                
-                <tr style="background-color:khaki;">
-                <th style="color:  #009879; text-align:left; " class="total">CASH ENDING</th>
-                <td data-label="DATE"><strong>₱</strong>  <?php 
+                <?php 
                 $netC = $totalFIO + $totalINO + $totalOPO;
-                if($netC < 0){
-                  echo '('.number_format(substr($netC,1)).')';
-                }else{
+                if($netC < 0){ ?>
+                <tr style="background-color:#F25E5E;">
+                <th style="color:#fff; text-align:left; " class="total">CASH ENDING</th>
+                <td style="color:#fff;" data-label="DATE"><strong>₱</strong> <?php
+                  echo '('.number_format(substr($netC,1)).')'; ?>
+                <?php
+                }else{ ?>
+                <tr style="background-color: #a7ff83;">
+                <th style="color:  #009879; text-align:left; " class="total">CASH ENDING</th>
+                <td data-label="DATE"><strong>₱</strong> <?php
                   echo number_format($netC);
                 }
                 ?></td>
@@ -328,18 +337,14 @@ include 'includes/menu.php'; ?>
             </table>
   
             <div class="button-footer">
-        <button type="button" class="buttonss">
+        <form action="../includes/dbprocess.php" Method="POST"> 
+        <button type="submit" name='print_CF' class="buttonss">
             <span class="button__texts">PRINT</span>
             <span class="button__icons">
             <ion-icon name="receipt-outline"></ion-icon>
         </span>
         </button>
-        <button type="buttons" class="buttonss">
-            <span class="button__texts">Download</span>
-            <span class="button__icons">
-            <ion-icon name="download-outline"></ion-icon>
-        </span>
-        </button>
+        </form>
 </div>
 
 

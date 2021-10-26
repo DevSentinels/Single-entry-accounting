@@ -74,12 +74,32 @@ if(isset($_POST['login_btn'])){
             $_SESSION ['isLoggedin'] = true;
             $_SESSION ['response'] = "Successfully Login!";
             $_SESSION ['first'] = true;
-            $_SESSION ['year'] = date("Y");
-            $_SESSION ['month']= date("m");
-            $_SESSION ['year_is'] = date("Y");
-            $_SESSION ['month_is']= date("m");
-            $date = DateTime::createFromFormat('Y-m-d', $_SESSION ['year_is'].'-'. $_SESSION ['month_is'].'-30');
-            $ISdetails = 'for the Month ended ' . $date->format('F d, Y');
+
+            $sqlforNoAccount = "SELECT MAX(YEAR(date)) as first_year, MAX(MONTH(date)) as first_month FROM `tblcashbookentry` WHERE `business_name` = '$BusinessName'";
+            $stmt = $conn->prepare($sqlforNoAccount);
+            $stmt->execute();
+            $result = $stmt->get_result();
+        
+            while ($row = $result->fetch_assoc()) {
+                    $firstyear = $row['first_year'];
+                    $firstmonth = $row['first_month'];
+            }
+
+
+            $_SESSION ['year'] = $firstyear;
+            $_SESSION ['month']= $firstmonth;
+            $_SESSION ['year_is'] = $firstyear;
+            $_SESSION ['month_is']= $firstmonth;
+            
+            $sqlforNoAccount = "SELECT DISTINCT `details` as details FROM `tblincomestatement` WHERE `date_month` = '$firstmonth' AND `date_year` = '$firstyear' AND `business_name` = '$BusinessName' ";
+            $stmt = $conn->prepare($sqlforNoAccount);
+            $stmt->execute();
+            $result = $stmt->get_result();
+        
+            while ($row = $result->fetch_assoc()) {
+                    $ISdetails = $row['details'];
+            }
+            
             $_SESSION ['ISdetails']= $ISdetails;
             $_SESSION ['res_type']= "success";
             
@@ -103,7 +123,21 @@ if(isset($_POST['show_table'])){
     $_SESSION ['year'] = $year;
     $_SESSION ['month']= $month;
 
+
+
 }
+
+
+if(isset($_POST['run_dashboard_report'])){
+
+    $year = $_POST['year'];
+
+
+    header("Location: ../SEA/dashboard.php");
+    $_SESSION ['year_is'] = $year;
+
+}
+
 
 
 //Add and Edit Entry on Cashbook 
@@ -119,7 +153,7 @@ if(isset($_POST['add_entry'])){
     $OldDate = mysqli_real_escape_string($conn, $_POST['Olddate']);
     $Description = mysqli_real_escape_string($conn, $_POST['description']);
     $Amount = mysqli_real_escape_string($conn, $_POST['amount']);
-    
+
     $Type = mysqli_real_escape_string($conn, $_POST['type_of_entry']);
 
     
@@ -132,6 +166,8 @@ if(isset($_POST['add_entry'])){
     }
 
 
+
+    //Adding entry
     if($ID == ""){
 
 
@@ -165,6 +201,18 @@ if(isset($_POST['add_entry'])){
                     $prevBal = $row['balance'];
                     $order = $row['order_by'];
             }
+
+            if($prevBal == 0){
+                $sqlforNoAccount = "SELECT balance FROM tblcashbookentry WHERE (order_by = (SELECT MAX(order_by) from tblcashbookentry WHERE date = (SELECT MAX(date) from tblcashbookentry WHERE date < '$Date')) AND date = (SELECT MAX(date) from tblcashbookentry WHERE date < '$Date')) AND (MONTH(date) = '$Month' AND YEAR(date) = '$Year' AND business_name = '$BusinessName')";
+                $stmt = $conn->prepare($sqlforNoAccount);
+                $stmt->execute();
+                $result = $stmt->get_result();
+
+                while ($row = $result->fetch_assoc()) {
+                    $prevBal = $row['balance'];
+                }    
+            }
+
             
             if($Inflows == "0"){
                 $Balance = $prevBal - $Outflows;
@@ -403,7 +451,7 @@ if(isset($_POST['add_entry'])){
     
     if($prevID == 0){
 
-    $sqlforNoAccount = "SELECT cbe_id, order_by FROM tblcashbookentry WHERE (order_by = (SELECT MAX(order_by) from tblcashbookentry WHERE date = (SELECT MAX(date) from tblcashbookentry WHERE date < '$Date')) AND date = (SELECT MAX(date) from tblcashbookentry WHERE date < '$Date')) AND (MONTH(date) = '$Month' AND YEAR(date) = '$Year' AND business_name = '$BusinessName')";
+    $sqlforNoAccount = "SELECT cbe_id FROM tblcashbookentry WHERE (order_by = (SELECT MAX(order_by) from tblcashbookentry WHERE date = (SELECT MAX(date) from tblcashbookentry WHERE date < '$Date' AND business_name = '$BusinessName')) AND date = (SELECT MAX(date) from tblcashbookentry WHERE date < '$Date' AND business_name = '$BusinessName')) AND (MONTH(date) = '$Month' AND YEAR(date) = '$Year' AND business_name = '$BusinessName')";
     $stmt = $conn->prepare($sqlforNoAccount);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -423,6 +471,8 @@ if(isset($_POST['add_entry'])){
     while ($row = $result->fetch_assoc()) {
             $prevBal = $row['balance'];
     }
+
+
     
     if($Inflows == "0"){
         $balance = $prevBal - $Outflows;
@@ -551,7 +601,7 @@ if(isset($_POST['delete_btn'])){
     
     if($prevID == 0){
 
-    $sqlforNoAccount = "SELECT cbe_id, order_by FROM tblcashbookentry WHERE (order_by = (SELECT MAX(order_by) from tblcashbookentry WHERE date = (SELECT MAX(date) from tblcashbookentry WHERE date < '$Date')) AND date = (SELECT MAX(date) from tblcashbookentry WHERE date < '$Date')) AND (MONTH(date) = '$Month' AND YEAR(date) = '$Year' AND business_name = '$BusinessName')";
+    $sqlforNoAccount = "SELECT cbe_id, order_by FROM tblcashbookentry WHERE (order_by = (SELECT MAX(order_by) from tblcashbookentry WHERE date = (SELECT MAX(date) from tblcashbookentry WHERE date < '$Date' AND business_name = '$BusinessName')) AND date = (SELECT MAX(date) from tblcashbookentry WHERE date < '$Date' AND business_name = '$BusinessName')) AND (MONTH(date) = '$Month' AND YEAR(date) = '$Year' AND business_name = '$BusinessName')";
     $stmt = $conn->prepare($sqlforNoAccount);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -833,20 +883,25 @@ if(isset($_POST['generate-monthly'])){
             $numberNeedUpdate = count($IDS);
     
     
+            $f = 0;
             for ($i=0; $i < $numberNeedUpdate ; $i++) { 
                 # code...
         
-                $sqlforNoAccount = "SELECT date, description, inflows, outflows FROM tblcashbookentry WHERE cbe_id = '$IDS[$i]'";
+                $sqlforNoAccount = "SELECT date, description, inflows, outflows, balance FROM tblcashbookentry WHERE cbe_id = '$IDS[$i]'";
                 $stmt = $conn->prepare($sqlforNoAccount);
                 $stmt->execute();
                 $result = $stmt->get_result();
-            
                 while ($row = $result->fetch_assoc()) {
                     
                         $update_description = $row['description'];
                         $update_inflows = $row['inflows'];
                         $update_outflows = $row['outflows'];
                         $last_date = $row['date'];
+
+                        if($f == 0){
+                            $first_balance = $row['balance'];
+                            $f++;
+                        }
                 }
     
         
@@ -903,7 +958,7 @@ if(isset($_POST['generate-monthly'])){
                 }else{
     
     
-                    $sqlforAccounts = "INSERT INTO tblcashflow(cf_id,business_name, date_month, date_year, type, category, description, amount, sign,details) VALUES ('',?,?,?,?,?,?,?,?,'');";
+                    $sqlforAccounts = "INSERT INTO tblcashflow(cf_id,business_name, date_month, date_year, type, category, description, first_balance, amount, sign,details) VALUES ('',?,?,?,?,?,?,'',?,?,'');";
                 
                     $stmt = mysqli_stmt_init($conn);
             
@@ -922,7 +977,7 @@ if(isset($_POST['generate-monthly'])){
     
             $ISdetails = 'for the Month ended ' . $date->format('F d, Y');
     
-            $sqlforAccounts = "UPDATE tblcashflow SET details='$ISdetails' WHERE `date_month` = ? AND `date_year` = ? AND `business_name` = ?";
+            $sqlforAccounts = "UPDATE tblcashflow SET details='$ISdetails', first_balance ='$first_balance' WHERE `date_month` = ? AND `date_year` = ? AND `business_name` = ?";
                     
                     $stmt = mysqli_stmt_init($conn);
             
@@ -1026,9 +1081,9 @@ function queryTable($Month, $Year, $BusinessName,$conn){
                 $this->Cell(5);
                 $this->Cell(22,10,$row['date'],1,0,'L');
                 $this->Cell(78,10,$row['description'],1,0,'L');
-                $this->Cell(30,10,$row['inflows'],1,0,'C');
-                $this->Cell(30,10,$row['outflows'],1,0,'C');
-                $this->Cell(30,10,$row['balance'],1,0,'C');
+                $this->Cell(30,10,number_format($row['inflows']),1,0,'C');
+                $this->Cell(30,10,number_format($row['outflows']),1,0,'C');
+                $this->Cell(30,10,number_format($row['balance']),1,0,'C');
                 $this->Ln();
         }
 }
@@ -1380,7 +1435,7 @@ if(isset($_POST['generate-quarterly'])){
         for ($i=0; $i < $numberNeedUpdate ; $i++) { 
             # code...
     
-            $sqlforNoAccount = "SELECT date, description, inflows, outflows FROM tblcashbookentry WHERE cbe_id = '$IDS[$i]'";
+            $sqlforNoAccount = "SELECT date, description, inflows, outflows, balance FROM tblcashbookentry WHERE cbe_id = '$IDS[$i]'";
             $stmt = $conn->prepare($sqlforNoAccount);
             $stmt->execute();
             $result = $stmt->get_result();
@@ -1393,6 +1448,7 @@ if(isset($_POST['generate-quarterly'])){
                     
                     if($f == 0){
                         $first_date = $row['date'];
+                        $first_balance = $row['balance'];
                         $f++;
                     }else{
                         $last_date = $row['date'];
@@ -1454,7 +1510,7 @@ if(isset($_POST['generate-quarterly'])){
             }else{
 
 
-                $sqlforAccounts = "INSERT INTO tblcashflow(cf_id, business_name, date_month, date_year, type, category, description, amount, sign, details) VALUES ('',?,?,?,?,?,?,?,?,'');";
+                $sqlforAccounts = "INSERT INTO tblcashflow(cf_id, business_name, date_month, date_year, type, category, description, first_balance, amount, sign, details) VALUES ('',?,?,?,?,?,?,'',?,?,'');";
             
                 $stmt = mysqli_stmt_init($conn);
         
@@ -1475,7 +1531,7 @@ if(isset($_POST['generate-quarterly'])){
 
         $ISdetails = 'for the Quarter started '. $date1->format('F d') . ' ended ' . $date2->format('F d, Y');
 
-        $sqlforAccounts = "UPDATE tblcashflow SET details='$ISdetails' WHERE `date_month` = ? AND `date_year` = ? AND `business_name` = ?";
+        $sqlforAccounts = "UPDATE tblcashflow SET details='$ISdetails', first_balance='$first_balance' WHERE `date_month` = ? AND `date_year` = ? AND `business_name` = ?";
                 
         $stmt = mysqli_stmt_init($conn);
 
@@ -1564,9 +1620,9 @@ function queryTable($Month, $Year, $BusinessName,$conn){
                 $this->Cell(5);
                 $this->Cell(22,10,$row['date'],1,0,'L');
                 $this->Cell(78,10,$row['description'],1,0,'L');
-                $this->Cell(30,10,$row['inflows'],1,0,'C');
-                $this->Cell(30,10,$row['outflows'],1,0,'C');
-                $this->Cell(30,10,$row['balance'],1,0,'C');
+                $this->Cell(30,10,number_format($row['inflows']),1,0,'C');
+                $this->Cell(30,10,number_format($row['outflows']),1,0,'C');
+                $this->Cell(30,10,number_format($row['balance']),1,0,'C');
                 $this->Ln();
         }
 }
@@ -1764,7 +1820,7 @@ if(isset($_POST['generate-yearly'])){
             }
 
 
-        $sqlforNoAccount = "SELECT cbe_id FROM tblcashbookentry WHERE ((MONTH(date) >= '$Months[0]' AND MONTH(date) <= '$Months[12]') AND (YEAR(date)= '$Year' AND business_name = '$BusinessName')) Order By date, order_by ASC";
+        $sqlforNoAccount = "SELECT cbe_id FROM tblcashbookentry WHERE ((MONTH(date) >= '$Months[1]' AND MONTH(date) <= '$Months[12]') AND (YEAR(date)= '$Year' AND business_name = '$BusinessName')) Order By date, order_by ASC";
         $stmt = $conn->prepare($sqlforNoAccount);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -1932,7 +1988,7 @@ if(isset($_POST['generate-yearly'])){
         for ($i=0; $i < $numberNeedUpdate ; $i++) { 
             # code...
     
-            $sqlforNoAccount = "SELECT date, description, inflows, outflows FROM tblcashbookentry WHERE cbe_id = '$IDS[$i]'";
+            $sqlforNoAccount = "SELECT date, description, inflows, outflows, balance FROM tblcashbookentry WHERE cbe_id = '$IDS[$i]'";
             $stmt = $conn->prepare($sqlforNoAccount);
             $stmt->execute();
             $result = $stmt->get_result();
@@ -1945,6 +2001,7 @@ if(isset($_POST['generate-yearly'])){
                     
                     if($f == 0){
                         $first_date = $row['date'];
+                        $first_balance = $row['balance'];
                         $f++;
                     }else{
                         $last_date = $row['date'];
@@ -2005,7 +2062,7 @@ if(isset($_POST['generate-yearly'])){
             }else{
 
 
-                $sqlforAccounts = "INSERT INTO tblcashflow(cf_id,business_name, date_month, date_year, type, category, description, amount, sign, details) VALUES ('',?,?,?,?,?,?,?,?,'');";
+                $sqlforAccounts = "INSERT INTO tblcashflow(cf_id,business_name, date_month, date_year, type, category, description,first_balance, amount, sign, details) VALUES ('',?,?,?,?,?,?,'',?,?,'');";
             
                 $stmt = mysqli_stmt_init($conn);
         
@@ -2026,7 +2083,7 @@ if(isset($_POST['generate-yearly'])){
 
         $ISdetails = 'for the Year started '. $date1->format('F d') . ' ended ' . $date2->format('F d, Y');
 
-        $sqlforAccounts = "UPDATE tblcashflow SET details='$ISdetails' WHERE `date_month` = ? AND `date_year` = ? AND `business_name` = ?";
+        $sqlforAccounts = "UPDATE tblcashflow SET details='$ISdetails', first_balance='$first_balance' WHERE `date_month` = ? AND `date_year` = ? AND `business_name` = ?";
                 
         $stmt = mysqli_stmt_init($conn);
 
@@ -2115,9 +2172,9 @@ function queryTable($Month, $Year, $BusinessName,$conn){
                 $this->Cell(5);
                 $this->Cell(22,10,$row['date'],1,0,'L');
                 $this->Cell(78,10,$row['description'],1,0,'L');
-                $this->Cell(30,10,$row['inflows'],1,0,'C');
-                $this->Cell(30,10,$row['outflows'],1,0,'C');
-                $this->Cell(30,10,$row['balance'],1,0,'C');
+                $this->Cell(30,10,number_format($row['inflows']),1,0,'C');
+                $this->Cell(30,10,number_format($row['outflows']),1,0,'C');
+                $this->Cell(30,10,number_format($row['balance']),1,0,'C');
                 $this->Ln();
         }
 }
@@ -2742,5 +2799,432 @@ if(isset($_POST['Search_Yearly_CF'])){
     $_SESSION ['year_is'] = $year;
     $_SESSION ['month_is']= $month;
     $_SESSION ['ISdetails']= $ISdetails;
+
+}
+
+if(isset($_POST['print_CF'])){
+
+
+    $BusinessName = $_SESSION ['business_name'];
+    $BusinessOwner =  $_SESSION ['business_owner'];
+    $Yearly =   $_SESSION ['year_is'];
+    $Monthly = $_SESSION ['month_is'];
+    $Detailsly = $_SESSION ['ISdetails'];
+
+    $MonthDetails = array('',
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July ',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December',);
+
+
+    if($Monthly == "Q1" || $Monthly == "Q2" || $Monthly == "Q3" || $Monthly == "Q4"){
+
+        $fileName = $BusinessName .'-Income Statement '.$Monthly.'-of-'.$Yearly.'.pdf';
+
+    }else if(strlen($Monthly) == 4){
+        $fileName = $BusinessName .'-Income Statement Year-of-'.$Yearly.'.pdf';
+    }else{
+        $fileName = $BusinessName .'-Income Statement '. $MonthDetails[$Monthly] .$Yearly.'.pdf';
+    }
+
+
+                
+    class PDF extends FPDF
+    {
+    // Page header
+    function Header()
+    {
+
+        if ( $this->PageNo() === 1 ) {
+                    // Logo
+       // $this->Image('../img/logo.png',100,6,170);
+        // Arial bold 15
+        $this->SetFont('Arial','B',14);
+        // Move to the right
+        
+        $this->Ln(10);
+        // Title
+        $this->Cell(100);
+        $this->Cell(10,10,'STATEMENT OF CASHFLOW',0,0,'C');
+        }
+
+    }
+    
+    // Page footer
+    function Footer()
+    {
+        // Position at 1.5 cm from bottom
+        $this->SetY(-15);
+        // Arial italic 8
+        $this->SetFont('Arial','I',8);
+        // Page number
+        $this->Cell(0,10,'Page '.$this->PageNo().'/{nb}',0,0,'C');
+    }
+    
+    // Page footer
+    function headerTable()
+    {
+        
+        
+      
+        // Arial italic 8
+        $this->SetFont('Arial','B',10);
+        // Page number
+        $this->Cell(5);
+        $this->Cell(95,10,'DESCRIPTION',1,0,'C');
+        $this->Cell(95,10,'AMOUNT',1,0,'C');
+        $this->Ln();
+    }
+
+
+   
+    function queryTableOP($month, $year, $Bname,$conn){
+            $this->SetFont('Arial','B',10);
+           
+          
+            $sqlforNoAccount = "SELECT `description`, `amount`, `sign` FROM `tblcashflow` WHERE `date_month` = '$month' AND `date_year` = '$year' AND `business_name` = '$Bname' AND `category` = 'OPERATING'";
+            $stmt = $conn->prepare($sqlforNoAccount);
+            $stmt->execute();
+            $result = $stmt->get_result();
+    
+            while ($row = $result->fetch_assoc()) {
+                    $this->Cell(5);
+                    $this->Cell(95,10,$row['description'],1,0,'L');
+                    if($row['sign'] == "negative"){
+                        $amount = '('.number_format($row['amount']).')'; 
+                      }else{
+                        
+                        $amount = number_format($row['amount']); 
+                      }
+                    $this->Cell(95,10,$amount,1,0,'R');
+                    $this->Ln();
+            }
+
+                    $query = "SELECT  SUM(amount) AS total_amount FROM `tblcashflow` WHERE `date_month` = '$month' AND `date_year` = '$year' AND `business_name` = '$Bname' AND `category` = 'OPERATING' AND `sign` = 'negative'";    
+                    $stmt = $conn->prepare($query);
+                    $stmt-> execute();
+                    $result = $stmt->get_result();  
+
+                    while ($row = $result->fetch_assoc()) {
+                        $totalnegative = $row['total_amount'];
+                    }
+
+                    $query = "SELECT  SUM(amount) AS total_amount FROM `tblcashflow` WHERE `date_month` = '$month' AND `date_year` = '$year' AND `business_name` = '$Bname' AND `category` = 'OPERATING' AND `sign` = 'positive'";    
+                    $stmt = $conn->prepare($query);
+                    $stmt-> execute();
+                    $result = $stmt->get_result();  
+
+                    while ($row = $result->fetch_assoc()) {
+                        $totalpositive = $row['total_amount'];
+                    }
+
+                    if($totalpositive > $totalnegative){
+                        $totalOP = $totalpositive - $totalnegative;
+                        $totalOPO = $totalpositive - $totalnegative;
+                        $totalOP = number_format($totalOP);
+                      }else{
+                        $totalOP = $totalnegative - $totalpositive;
+                        $totalOPO = $totalpositive - $totalnegative;
+                        $totalOP = '('.number_format($totalOP).')';
+                      }
+
+
+                    $this->Cell(5);
+                    $this->Cell(95,10,'Net cash provided (used) from operating activities',1,0,'L');
+                    $this->Cell(95,10,$totalOP,1,0,'R');
+                    $this->Ln();
+
+    }
+
+    function queryTableIN($month, $year, $Bname,$conn){
+        $this->SetFont('Arial','B',10);
+       
+      
+        $sqlforNoAccount = "SELECT `description`, `amount`, `sign` FROM `tblcashflow` WHERE `date_month` = '$month' AND `date_year` = '$year' AND `business_name` = '$Bname' AND `category` = 'INVESTING'";
+        $stmt = $conn->prepare($sqlforNoAccount);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        while ($row = $result->fetch_assoc()) {
+                $this->Cell(5);
+                $this->Cell(95,10,$row['description'],1,0,'L');
+                if($row['sign'] == "negative"){
+                    $amount = '('.number_format($row['amount']).')'; 
+                  }else{
+                    
+                    $amount = number_format($row['amount']); 
+                  }
+                $this->Cell(95,10,$amount,1,0,'R');
+                $this->Ln();
+        }
+
+                $query = "SELECT  SUM(amount) AS total_amount FROM `tblcashflow` WHERE `date_month` = '$month' AND `date_year` = '$year' AND `business_name` = '$Bname' AND `category` = 'INVESTING' AND `sign` = 'negative'";    
+                $stmt = $conn->prepare($query);
+                $stmt-> execute();
+                $result = $stmt->get_result();  
+
+                while ($row = $result->fetch_assoc()) {
+                    $totalnegative = $row['total_amount'];
+                }
+
+                $query = "SELECT  SUM(amount) AS total_amount FROM `tblcashflow` WHERE `date_month` = '$month' AND `date_year` = '$year' AND `business_name` = '$Bname' AND `category` = 'INVESTING' AND `sign` = 'positive'";    
+                $stmt = $conn->prepare($query);
+                $stmt-> execute();
+                $result = $stmt->get_result();  
+
+                while ($row = $result->fetch_assoc()) {
+                    $totalpositive = $row['total_amount'];
+                }
+
+                if($totalpositive > $totalnegative){
+                    $totalOP = $totalpositive - $totalnegative;
+                    $totalOPO = $totalpositive - $totalnegative;
+                    $totalOP = number_format($totalOP);
+                  }else{
+                    $totalOP = $totalnegative - $totalpositive;
+                    $totalOPO = $totalpositive - $totalnegative;
+                    $totalOP = '('.number_format($totalOP).')';
+                  }
+
+
+                $this->Cell(5);
+                $this->Cell(95,10,'Net cash provided (used) from investing activities',1,0,'L');
+                $this->Cell(95,10,$totalOP,1,0,'R');
+                $this->Ln();
+
+}
+
+function queryTableFN($month, $year, $Bname,$conn){
+    $this->SetFont('Arial','B',10);
+   
+  
+    $sqlforNoAccount = "SELECT `description`, `amount`, `sign` FROM `tblcashflow` WHERE `date_month` = '$month' AND `date_year` = '$year' AND `business_name` = '$Bname' AND `category` = 'FINANCING'";
+    $stmt = $conn->prepare($sqlforNoAccount);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    while ($row = $result->fetch_assoc()) {
+            $this->Cell(5);
+            $this->Cell(95,10,$row['description'],1,0,'L');
+            if($row['sign'] == "negative"){
+                $amount = '('.number_format($row['amount']).')'; 
+              }else{
+                
+                $amount = number_format($row['amount']); 
+              }
+            $this->Cell(95,10,$amount,1,0,'R');
+            $this->Ln();
+    }
+
+            $query = "SELECT  SUM(amount) AS total_amount FROM `tblcashflow` WHERE `date_month` = '$month' AND `date_year` = '$year' AND `business_name` = '$Bname' AND `category` = 'FINANCING' AND `sign` = 'negative'";    
+            $stmt = $conn->prepare($query);
+            $stmt-> execute();
+            $result = $stmt->get_result();  
+
+            while ($row = $result->fetch_assoc()) {
+                $totalnegative = $row['total_amount'];
+            }
+
+            $query = "SELECT  SUM(amount) AS total_amount FROM `tblcashflow` WHERE `date_month` = '$month' AND `date_year` = '$year' AND `business_name` = '$Bname' AND `category` = 'FINANCING' AND `sign` = 'positive'";    
+            $stmt = $conn->prepare($query);
+            $stmt-> execute();
+            $result = $stmt->get_result();  
+
+            while ($row = $result->fetch_assoc()) {
+                $totalpositive = $row['total_amount'];
+            }
+
+            if($totalpositive > $totalnegative){
+                $totalOP = $totalpositive - $totalnegative;
+                $totalOPO = $totalpositive - $totalnegative;
+                $totalOP = number_format($totalOP);
+              }else{
+                $totalOP = $totalnegative - $totalpositive;
+                $totalOPO = $totalpositive - $totalnegative;
+                $totalOP = '('.number_format($totalOP).')';
+              }
+
+
+            $this->Cell(5);
+            $this->Cell(95,10,'Net cash provided (used) from financing activities',1,0,'L');
+            $this->Cell(95,10,$totalOP,1,0,'R');
+            $this->Ln();
+
+}
+
+function queryTableNC($month, $year, $Bname,$conn){
+    $this->SetFont('Arial','B',10);
+   
+    
+    $query = "SELECT  SUM(amount) AS total_amount FROM `tblcashflow` WHERE `date_month` = '$month' AND `date_year` = '$year' AND `business_name` = '$Bname' AND `category` = 'OPERATING' AND `sign` = 'negative'";    
+    $stmt = $conn->prepare($query);
+    $stmt-> execute();
+    $result = $stmt->get_result();  
+
+    while ($row = $result->fetch_assoc()) {
+        $totalnegative = $row['total_amount'];
+    }
+
+    $query = "SELECT  SUM(amount) AS total_amount FROM `tblcashflow` WHERE `date_month` = '$month' AND `date_year` = '$year' AND `business_name` = '$Bname' AND `category` = 'OPERATING' AND `sign` = 'positive'";    
+    $stmt = $conn->prepare($query);
+    $stmt-> execute();
+    $result = $stmt->get_result();  
+
+    while ($row = $result->fetch_assoc()) {
+        $totalpositive = $row['total_amount'];
+    }
+
+    
+    $totalOPO = $totalpositive - $totalnegative;
+
+    $query = "SELECT  SUM(amount) AS total_amount FROM `tblcashflow` WHERE `date_month` = '$month' AND `date_year` = '$year' AND `business_name` = '$Bname' AND `category` = 'INVESTING' AND `sign` = 'negative'";    
+    $stmt = $conn->prepare($query);
+    $stmt-> execute();
+    $result = $stmt->get_result();  
+
+    while ($row = $result->fetch_assoc()) {
+        $totalnegative = $row['total_amount'];
+    }
+
+    $query = "SELECT  SUM(amount) AS total_amount FROM `tblcashflow` WHERE `date_month` = '$month' AND `date_year` = '$year' AND `business_name` = '$Bname' AND `category` = 'INVESTING' AND `sign` = 'positive'";    
+    $stmt = $conn->prepare($query);
+    $stmt-> execute();
+    $result = $stmt->get_result();  
+
+    while ($row = $result->fetch_assoc()) {
+        $totalpositive = $row['total_amount'];
+    }
+
+    
+    $totalINO = $totalpositive - $totalnegative;
+
+
+    $query = "SELECT  SUM(amount) AS total_amount FROM `tblcashflow` WHERE `date_month` = '$month' AND `date_year` = '$year' AND `business_name` = '$Bname' AND `category` = 'FINANCING' AND `sign` = 'negative'";    
+    $stmt = $conn->prepare($query);
+    $stmt-> execute();
+    $result = $stmt->get_result();  
+
+    while ($row = $result->fetch_assoc()) {
+        $totalnegative = $row['total_amount'];
+    }
+
+    $query = "SELECT  SUM(amount) AS total_amount FROM `tblcashflow` WHERE `date_month` = '$month' AND `date_year` = '$year' AND `business_name` = '$Bname' AND `category` = 'FINANCING' AND `sign` = 'positive'";    
+    $stmt = $conn->prepare($query);
+    $stmt-> execute();
+    $result = $stmt->get_result();  
+
+    while ($row = $result->fetch_assoc()) {
+        $totalpositive = $row['total_amount'];
+    }
+
+    
+    $totalFNO = $totalpositive - $totalnegative;
+
+    $netC = $totalFNO + $totalINO + $totalOPO;
+
+    if($netC < 0){
+        $netC = '('.number_format(substr($netC,1)).')';
+      }else{
+        $netC =  number_format($netC);
+      }
+    
+    $query = "SELECT  first_balance FROM `tblcashflow` WHERE `date_month` = '$month' AND `date_year` = '$year' AND `business_name` = '$Bname'";    
+    $stmt = $conn->prepare($query);
+    $stmt-> execute();
+    $result = $stmt->get_result();  
+
+    while ($row = $result->fetch_assoc()) {
+        $first_balance = $row['first_balance'];
+    }   
+
+            $this->Cell(5);
+            $this->Cell(95,10,'Cash Beginning',1,0,'L');
+            $this->Cell(95,10,number_format($first_balance),1,0,'R');
+            $this->Ln();
+
+            $this->Cell(5);
+            $this->Cell(95,10,'Cash Ending',1,0,'L');
+            $this->Cell(95,10,$netC,1,0,'R');
+            $this->Ln();
+
+
+
+}
+
+    
+    
+    function Signatory($BusinessOwner, $BusinessName)
+    {
+        $this->Ln(15);
+        $this->SetFont('Arial','B',12);
+        $this->Cell(15);
+        $this->Cell(0,10,$BusinessOwner,0,0,'R');
+        $this->Ln(6);
+        $this->Cell(15);
+        $this->SetFont('Arial','B',12);
+        $this->Cell(0,10,$BusinessName .', Owner',0,0,'R');
+        // Line break
+        $this->Ln(20);
+    }
+
+    function subhead($ISdetails)
+{
+    $this->Ln(8);
+    $this->SetFont('Arial','B',12);
+    $this->Cell(15);
+    $this->Cell(0,10, $ISdetails ,0,0,'C');
+    // Line break
+    $this->Ln(12);
+}
+
+function subhead1($ISdetails)
+{
+    $this->Ln(8);
+    $this->SetFont('Arial','B',12);
+    $this->Cell(10);
+    $this->Cell(0,10, $ISdetails ,0,0,'C');
+    // Line break
+    $this->Ln(12);
+}
+    
+    
+    
+    }
+    
+    $pdf = new PDF();
+    $pdf->AliasNbPages();
+    $pdf->AddPage('P','Legal',0);
+
+    $pdf->subhead($Detailsly);
+
+    $pdf->subhead1("OPERATING");
+    $pdf->headerTable();
+    $pdf->queryTableOP($Monthly, $Yearly, $BusinessName,$conn);
+
+    $pdf->subhead1("INVESTING");
+    $pdf->headerTable();
+    $pdf->queryTableIN($Monthly, $Yearly, $BusinessName,$conn);
+
+    $pdf->subhead1("FINANCING");
+    $pdf->headerTable();
+    $pdf->queryTableFN($Monthly, $Yearly, $BusinessName,$conn);
+
+    $pdf->subhead1("NET CHANGE IN CASH");
+    $pdf->headerTable();
+    $pdf->queryTableNC($Monthly, $Yearly, $BusinessName,$conn);
+    
+    
+    $pdf->Signatory($BusinessOwner, $BusinessName);
+    $pdf->Output($fileName, 'D');
+          
 
 }

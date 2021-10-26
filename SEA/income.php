@@ -147,21 +147,39 @@ include 'includes/menu.php'; ?>
                     <?php   $totalexpenses = $row['total_amount'];} ?>
            
                 </tr>
-                <tr style="background:#a7ff83;">
-                    <th style="color:#009879; text-align:left;" class="total">
-                    <?php 
 
-                   $sum = $totalincome - $totalexpenses;
+                  <?php 
+
+                  if($totalincome > $totalexpenses){
+                    $sum = $totalincome - $totalexpenses;
+                    $sum1 =  $totalincome - $totalexpenses;
+                  }else{
+                    $sum1 =  $totalincome - $totalexpenses;
+                    $sum =  $totalexpenses - $totalincome;
+                  }
+
+                  
  
-                    if($sum < 0){
-                      echo "NET LOSS";
+                    if($sum1 < 0){
+                      ?>
+                      <tr style="background-color: #F25E5E;">
+                      <th style="color:#fff; text-align:left;" class="total">
+                      <?php echo "NET LOSS"; ?>
+                      </th>
+                      <td style="color:#fff" ><strong>₱ </strong> <?php echo "(".number_format($sum).")"?></td>
+                      </tr>
+                      <?php
                     }else{
-                      echo "NET PROFIT";
-                    }
-                       ?></th>
-                    <td ><strong>₱ </strong> <?= number_format($sum)?></td>
-           
-                </tr>
+                      ?>
+                      <tr style="background:#a7ff83;">
+                      <th style="color:#009879; text-align:left;" class="total">
+                      <?php echo "NET PROFIT"; ?>
+                      </th>
+                      <td ><strong>₱ </strong> <?= number_format($sum)?></td>
+                      </tr>
+                  <?php }?>
+
+                
 
 
             </tbody>
@@ -173,14 +191,6 @@ include 'includes/menu.php'; ?>
             <span class="button__texts">PRINT</span>
             <span class="button__icons">
             <ion-icon name="receipt-outline"></ion-icon>
-        </span>
-        </button>
-        </form>
-        <form action="../includes/dbprocess.php" Method="POST"> 
-        <button type="submit" class="buttonss" name="download_IS">
-            <span class="button__texts">Download</span>
-            <span class="button__icons">
-            <ion-icon name="download-outline"></ion-icon>
         </span>
         </button>
         </form>

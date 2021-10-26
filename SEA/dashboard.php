@@ -27,27 +27,26 @@ include 'includes/menu.php';
                 <h2>Annual Report</h2>
             </div>
     </div>
-          <form action="" method="POST">
+          <form action="../includes/dbprocess.php" Method="POST">
                     <div id="Quarterly" class="filter-wrapper">
-
                         <span class="custom-dropdown big">
-                        <select name="year" required>    
-                        <option >2021</option>
-                        <option >2021</option>
-                        <option >2021</option>
-                        <option >2021</option>
-                        <option >2021</option>
-                        <option >2021</option>
-                        <option >2021</option>
-                        <option >2021</option>
-                       
-                        </select>
+                        <?php
+                    $query = "SELECT DISTINCT YEAR(date) as year FROM `tblcashbookentry` WHERE `business_name` = '$Bname'";    
+                    $stmt = $conn->prepare($query);
+                    $stmt->execute();
+                    $result = $stmt->get_result();
+                ?>   
+               <select name="year">    
+                    <?php while ($row = $result->fetch_assoc()) { ?>
+                        <option value="<?= $row['year']; ?>"><?= $row['year']; ?></option>
+                    <?php } ?>  
+               </select>
 
 
                         </span>
               
                         <div class="input-container cta">
-                                        <button class="signup-btn continue" type="submit" name="generate-quarterly">RUN REPORT</button>
+                                        <button class="signup-btn continue" type="submit" name="run_dashboard_report">RUN REPORT</button>
                                 </div>
                                 
                         </div>
@@ -117,6 +116,179 @@ include 'includes/menu.php';
 
    
   -->
+<?php
+
+    $Bname = $_SESSION['business_name'];
+    $year =  $_SESSION ['year_is'];
+    $income = array();
+    $expense = array();
+
+          for ($i=0; $i < 13; $i++) { 
+            # code...
+            $income[$i] = 0;
+            $expense[$i] = 0;
+          }
+
+
+          $query = "SELECT  COUNT(DISTINCT date_month) AS total_month FROM `tblincomestatement` WHERE `type` = 'Monthly' AND `date_year` = '$year' AND `business_name` = '$Bname' AND `category` = 'INCOME'";    
+          $stmt = $conn->prepare($query);
+          $stmt-> execute();
+          $result = $stmt->get_result();  
+      
+          while ($row = $result->fetch_assoc()) {
+              $total_month = $row['total_month'];
+          }
+
+
+    for ($i=1; $i <= $total_month ; $i++) {  
+        # code...
+
+        $query = "SELECT  SUM(amount) AS total_amount FROM `tblincomestatement` WHERE `date_month` = '$i' AND `date_year` = '$year' AND `business_name` = '$Bname' AND `category` = 'INCOME'";    
+        $stmt = $conn->prepare($query);
+        $stmt-> execute();
+        $result = $stmt->get_result();  
+    
+        while ($row = $result->fetch_assoc()) {
+            $income[$i] = $row['total_amount'];
+        }
+
+
+        $query = "SELECT  SUM(amount) AS total_amount FROM `tblincomestatement` WHERE `date_month` = '$i' AND `date_year` = '$year' AND `business_name` = '$Bname' AND `category` = 'EXPENSES'";    
+        $stmt = $conn->prepare($query);
+        $stmt-> execute();
+        $result = $stmt->get_result();  
+    
+        while ($row = $result->fetch_assoc()) {
+            $expense[$i] = $row['total_amount'];
+        }
+    }
+
+    for ($i=1; $i < 13 ; $i++) { 
+      # code...
+      $total_income = $total_income + $income[$i];
+      $total_expenses = $total_expenses + $expense[$i];
+    }
+
+
+
+
+          $lastmoney = array ();          
+          for ($i=1; $i < 13 ; $i++) { 
+            # code...
+            if($income[$i] > $expense[$i]){
+              $lastmoney[$i] = $income[$i] - $expense[$i];
+            }else{
+              $lastmoney[$i] = $expense[$i] - $income[$i];
+            }
+           
+          }
+
+
+    for ($i=1; $i <= 12 ; $i++) { 
+      # code...
+                    //financing
+                    $query = "SELECT  SUM(amount) AS total_amount FROM `tblcashflow` WHERE `date_month` = '$i' AND `date_year` = '$year' AND `business_name` = '$Bname' AND `category` = 'FINANCING' AND `sign` = 'negative'";    
+                    $stmt = $conn->prepare($query);
+                    $stmt-> execute();
+                    $result = $stmt->get_result();  
+
+                  
+                    while ($row = $result->fetch_assoc()) {
+                        $f_neg = $f_neg + $row['total_amount'];
+                    }
+
+                    $query = "SELECT  SUM(amount) AS total_amount FROM `tblcashflow` WHERE `date_month` = '$i' AND `date_year` = '$year' AND `business_name` = '$Bname' AND `category` = 'FINANCING' AND `sign` = 'positive'";    
+                    $stmt = $conn->prepare($query);
+                    $stmt-> execute();
+                    $result = $stmt->get_result();  
+
+                    while ($row = $result->fetch_assoc()) {
+                      $f_pos = $f_pos + $row['total_amount'];
+                    }
+
+
+
+                    //operating
+                    $query = "SELECT  SUM(amount) AS total_amount FROM `tblcashflow` WHERE `date_month` = '$i' AND `date_year` = '$year' AND `business_name` = '$Bname' AND `category` = 'OPERATING' AND `sign` = 'negative'";    
+                    $stmt = $conn->prepare($query);
+                    $stmt-> execute();
+                    $result = $stmt->get_result();  
+
+                  
+                    while ($row = $result->fetch_assoc()) {
+                        $o_neg = $o_neg + $row['total_amount'];
+                    }
+
+                    $query = "SELECT  SUM(amount) AS total_amount FROM `tblcashflow` WHERE `date_month` = '$i' AND `date_year` = '$year' AND `business_name` = '$Bname' AND `category` = 'OPERATING' AND `sign` = 'positive'";    
+                    $stmt = $conn->prepare($query);
+                    $stmt-> execute();
+                    $result = $stmt->get_result();  
+
+                    while ($row = $result->fetch_assoc()) {
+                      $o_pos = $o_pos + $row['total_amount'];
+                    }
+
+
+                    //investing
+                    $query = "SELECT  SUM(amount) AS total_amount FROM `tblcashflow` WHERE `date_month` = '$i' AND `date_year` = '$year' AND `business_name` = '$Bname' AND `category` = 'INVESTING' AND `sign` = 'negative'";    
+                    $stmt = $conn->prepare($query);
+                    $stmt-> execute();
+                    $result = $stmt->get_result();  
+
+                  
+                    while ($row = $result->fetch_assoc()) {
+                        $i_neg = $i_neg + $row['total_amount'];
+                    }
+
+                    $query = "SELECT  SUM(amount) AS total_amount FROM `tblcashflow` WHERE `date_month` = '$i' AND `date_year` = '$year' AND `business_name` = '$Bname' AND `category` = 'INVESTING' AND `sign` = 'positive'";    
+                    $stmt = $conn->prepare($query);
+                    $stmt-> execute();
+                    $result = $stmt->get_result();  
+
+                    while ($row = $result->fetch_assoc()) {
+                      $i_pos = $i_pos + $row['total_amount'];
+                    }
+
+    }
+
+    if($f_pos > $f_neg){
+    $financing = $f_pos - $f_neg;
+    }else{
+      $financing = $f_neg - $f_pos;
+    }
+
+
+    
+      if($o_pos > $o_neg){
+      
+    $operating = $o_pos - $o_neg;
+      }else{
+        
+    $operating = $o_neg -  $o_pos;
+      }
+
+
+      if($i_pos > $i_neg){
+      
+    $investing = $i_pos - $i_neg;
+          }else{
+            
+        $investing = $i_neg -  $i_pos;
+          }
+        
+    
+
+
+
+
+
+
+
+
+?>
+
+
+  
   <script type="text/javascript">
       google.charts.load('current', {'packages':['corechart', 'bar']});
       google.charts.setOnLoadCallback(drawStuff);
@@ -128,18 +300,18 @@ include 'includes/menu.php';
 
         var data = google.visualization.arrayToDataTable([
           ['INCOME STATEMENT', 'INCOME', 'EXPENSES'],
-          ['JAN', 15000, 30000],
-          ['FEB', 8000, 30000],
-          ['MAR', 8000, 30000],
-          ['APR', 8000, 30000],
-          ['MAY', 8000, 30000],
-          ['JUN', 8000, 30000],
-          ['JUL', 8000, 30000],
-          ['AUG', 24000, 30000],
-          ['SEP', 30000, 30000],
-          ['OCT', 50000, 30000],
-          ['NOV', 60000, 30000],
-          ['DEC', 60000,30000]
+          ['JAN', <?php echo $income[1]?>, <?php echo $expense[1]?>],
+          ['FEB', <?php echo $income[2]?>, <?php echo $expense[2]?>],
+          ['MAR', <?php echo $income[3]?>, <?php echo $expense[3]?>],
+          ['APR', <?php echo $income[4]?>, <?php echo $expense[4]?>],
+          ['MAY', <?php echo $income[5]?>, <?php echo $expense[5]?>],
+          ['JUN', <?php echo $income[6]?>, <?php echo $expense[6]?>],
+          ['JUL', <?php echo $income[7]?>, <?php echo $expense[7]?>],
+          ['AUG', <?php echo $income[8]?>, <?php echo $expense[8]?>],
+          ['SEP', <?php echo $income[9]?>, <?php echo $expense[9]?>],
+          ['OCT', <?php echo $income[10]?>, <?php echo $expense[10]?>],
+          ['NOV', <?php echo $income[11]?>, <?php echo $expense[11]?>],
+          ['DEC', <?php echo $income[12]?>, <?php echo $expense[12]?>]
         ]);
 
         var materialOptions = {
@@ -188,9 +360,9 @@ google.charts.setOnLoadCallback(drawChart);
 function drawChart() {
   var data = google.visualization.arrayToDataTable([
     ['INCOME', 'EXPENSES'],
-    ['OPERATING',     23000],
-    ['FINANCING',     5000],
-    ['INVESTING',     30000]
+    ['OPERATING',      <?php echo $operating?>],
+    ['FINANCING',      <?php echo $financing?>],
+    ['INVESTING',      <?php echo $investing?>]
     
   ]);
 
@@ -220,18 +392,18 @@ function drawChart() {
     function drawChart() {
       var data = google.visualization.arrayToDataTable([
         ["cash", "amount", { role: "style" } ],
-        ["JAN", 30000, "#17b978"],
-        ["FEB", 10200, "#17b978"],
-        ["MAR", 10610, "#17b978"],
-        ["APR", 50000, "#17b978"],
-        ["MAY", 60000, "#17b978"],
-        ["JUN", 40000, "#17b978"],
-        ["JUL", 50000, "#17b978"],
-        ["AUG", 60000, "#17b978"],
-        ["SEP", 20000, "#17b978"],
-        ["OCT", 20000, "#17b978"],
-        ["NOV", 32000, "#17b978"],
-        ["DEC", 20000, "#17b978"]
+        ["JAN", <?php echo $lastmoney[1]?>, "#17b978"],
+        ["FEB", <?php echo $lastmoney[2]?>, "#17b978"],
+        ["MAR", <?php echo $lastmoney[3]?>, "#17b978"],
+        ["APR", <?php echo $lastmoney[4]?>, "#17b978"],
+        ["MAY", <?php echo $lastmoney[5]?>, "#17b978"],
+        ["JUN", <?php echo $lastmoney[6]?>, "#17b978"],
+        ["JUL", <?php echo $lastmoney[7]?>, "#17b978"],
+        ["AUG", <?php echo $lastmoney[8]?>, "#17b978"],
+        ["SEP", <?php echo $lastmoney[9]?>, "#17b978"],
+        ["OCT", <?php echo $lastmoney[10]?>, "#17b978"],
+        ["NOV", <?php echo $lastmoney[11]?>, "#17b978"],
+        ["DEC", <?php echo $lastmoney[12]?>, "#17b978"]
       ]);
 
       var view = new google.visualization.DataView(data);
@@ -255,48 +427,7 @@ function drawChart() {
   
       </script>
 
-      <script>
-
-        
-  google.charts.load("current", {packages:['corechart']});
-    google.charts.setOnLoadCallback(drawChart);
-    function drawChart() {
-      var data = google.visualization.arrayToDataTable([
-        ["cash", "amount", { role: "style" } ],
-        ["JAN", 30000, "#17b978"],
-        ["FEB", 10200, "#17b978"],
-        ["MAR", 10610, "#17b978"],
-        ["APR", 50000, "#17b978"],
-        ["MAY", 60000, "#17b978"],
-        ["JUN", 40000, "#17b978"],
-        ["JUL", 50000, "#17b978"],
-        ["AUG", 60000, "#17b978"],
-        ["SEP", 20000, "#17b978"],
-        ["OCT", 20000, "#17b978"],
-        ["NOV", 32000, "#17b978"],
-        ["DEC", 20000, "#17b978"]
-      ]);
-
-      var view = new google.visualization.DataView(data);
-      view.setColumns([0, 1,
-                       { calc: "stringify",
-                         sourceColumn: 1,
-                         type: "string",
-                         role: "annotation" },
-                       2]);
-
-      var options = {
-        title: "Cashflow of the year ended 2021",
-        width: 600,
-        height: 300,
-        bar: {groupWidth: "70%"},
-        legend: { position: "none" },
-      };
-      var chart = new google.visualization.ColumnChart(document.getElementById("columnchart_values"));
-      chart.draw(view, options);
-  }
-  
-      </script>
+    
 
       <script>
 
@@ -307,8 +438,8 @@ function drawChart() {
 
   var data = google.visualization.arrayToDataTable([
     ['INCOME', 'AMOUNT'],
-    ['INCOME',     30000],
-    ['EXPENSES',     20000],
+    ['INCOME',   <?php echo $total_income?>],
+    ['EXPENSES', <?php echo $total_expenses?>],
     
   ]);
 

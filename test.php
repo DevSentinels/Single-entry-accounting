@@ -8,40 +8,28 @@
 </head>
 <body>
     <?php
-            
-        $sqlforNoAccount = "SELECT date, description, inflows, outflows, balance FROM tblcashbookentry WHERE ((MONTH(date) = '$Month' AND YEAR(date)= '$Year') AND (business_name = '$BusinessName')) Order By date, order_by ASC";
-        $setRec = mysqli_query($conn, $sqlforNoAccount);
+    include_once './includes/dbconnect.php';
 
+    $Bname = 'Ralph PC Store';
+    $year = '2021';
+    $income = array();
+    $expense = array();
 
-        $fileName = $BusinessName .'-Cashbook Entry Records-' . $MonthDetails[$Month].$Year.'.xlsx';
+    for ($i=1; $i < 13 ; $i++) {  
+        # code...
 
+        $query = "SELECT  SUM(amount) AS total_amount FROM `tblincomestatement` WHERE `date_month` = '$i' AND `date_year` = '$year' AND `business_name` = '$Bname' AND `category` = 'INCOME'";    
+        $stmt = $conn->prepare($query);
+        $stmt-> execute();
+        $result = $stmt->get_result();  
+    
+        while ($row = $result->fetch_assoc()) {
+            $income[$i] = $row['total_amount'];
+        }
 
-        $columnHeader = '';  
-        $columnHeader = "Date" . "\t" . "Description" . "\t" . "Inflows" . "\t". "Outflows" . "\t". "Balance" . "\t";  
-  
-        $setData = '';  
+        print_r($income[$i] . '\n') ;
 
-        while ($rec = mysqli_fetch_row($setRec)) {  
-            $rowData = '';  
-            foreach ($rec as $value) {  
-                $value = '"' . $value . '"' . "\t";  
-                $rowData .= $value;  
-            }  
-            $setData .= trim($rowData) . "\n";  
-        }  
-
-        header("Content-type: application/octet-stream");  
-        header("Content-Disposition: attachment; filename=".$fileName);  
-        header("Pragma: no-cache");  
-        header("Expires: 0");  
-  
-        echo ucwords($columnHeader) . "\n" . $setData . "\n"; 
-
-
-
-
-
-
+    }
 
 ?>
 </body>

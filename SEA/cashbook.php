@@ -105,16 +105,15 @@ include 'includes/menu.php';
 <form action="../includes/dbprocess.php" Method="POST">
           <span class="custom-dropdown big">
                <select id="Month" name="month">    
-                    <option value="">Month</option>
-                    <option value="01">January</option>
-                    <option value="02">February</option>
-                    <option value="03">March</option>
-                    <option value="04">April</option>
-                    <option value="05">May</option>
-                    <option value="06">June</option>
-                    <option value="07">July</option>
-                    <option value="08">August</option>
-                    <option value="09">September</option>
+                    <option value="1">January</option>
+                    <option value="2">February</option>
+                    <option value="3">March</option>
+                    <option value="4">April</option>
+                    <option value="5">May</option>
+                    <option value="6">June</option>
+                    <option value="7">July</option>
+                    <option value="8">August</option>
+                    <option value="9">September</option>
                     <option value="10">October</option>
                     <option value="11">November</option>
                     <option value="12">December</option>
@@ -122,18 +121,17 @@ include 'includes/menu.php';
                </span>
 
                <span class="custom-dropdown big">
+                   
+               <?php
+                    $query = "SELECT DISTINCT YEAR(date) as year FROM `tblcashbookentry` WHERE `business_name` = '$Bname'";    
+                    $stmt = $conn->prepare($query);
+                    $stmt->execute();
+                    $result = $stmt->get_result();
+                ?>   
                <select id="Year" name="year">    
-                    <option>Year</option>
-                    <option value="2021">2021</option>
-                    <option value="2022">2022</option>
-                    <option value="2023">2023</option>
-                    <option value="2024">2024</option>
-                    <option value="2025">2025</option>
-                    <option value="2026">2026</option>
-                    <option value="2027">2027</option>
-                    <option value="2028">2028</option>
-                    <option value="2029">2029</option>
-                    <option value="2030">2030</option>
+                    <?php while ($row = $result->fetch_assoc()) { ?>
+                        <option value="<?= $row['year']; ?>"><?= $row['year']; ?></option>
+                    <?php } ?>  
                </select>
                </span>
                <span data-tooltip="SHOW RECORDS" >
@@ -238,6 +236,7 @@ include 'includes/menu.php';
                                         return false;
                                 return true;
 
+                            
                         }
 
                         function setDataOnSelection(){
@@ -267,7 +266,7 @@ include 'includes/menu.php';
                 <tr>
                 <th hidden>ID</th>
                 <th>Date</th>
-                <th hidden>OD</th>
+                <th hidden >OD</th>
                 <th>Description</th>
                 <th>Inflows</th>
                 <th>Outflows</th>
@@ -282,9 +281,9 @@ include 'includes/menu.php';
                 <td data-label="Date"><?= $row['date'] ?></td>
                 <td data-label="OD" hidden><?= $row['order_by'] ?></td>
                 <td data-label="Description"><?= $row['description'] ?></td>
-                <td data-label="Inflows"> <strong>₱ </strong><?= $row['inflows'] ?></td>
-                <td data-label="Outflows"><strong>₱ </strong><?= $row['outflows'] ?></td>
-                <td data-label="Balance"><strong>₱ </strong><?= $row['balance'] ?></td>
+                <td data-label="Inflows"> <strong>₱ </strong><?= number_format($row['inflows']) ?></td>
+                <td data-label="Outflows"><strong>₱ </strong><?= number_format($row['outflows']) ?></td>
+                <td data-label="Balance"><strong>₱ </strong><?= number_format($row['balance']) ?></td>
                 <td data-label="Actions">
                     <span data-tooltip="Edit record">
                     <a href="javascripit:void(0)" class="button editData" data-modal-target="#modal">
@@ -325,9 +324,9 @@ include 'includes/menu.php';
                                     var date = data[1];
                                     var od = data[2];
                                     var description = data[3];
-                                    var inflows = data[4].substring(2);
-                                    var outflows = data[5].substring(1);
-                                    var balance = data[6].substring(1);
+                                    var inflows = data[4].substring(2).replace(/,/g, "");
+                                    var outflows = data[5].substring(1).replace(/,/g, "");
+                                    var balance = data[6].substring(1).replace(/,/g, "");
 
                                         $('#id').val(id);
                                         $('#od').val(od);
