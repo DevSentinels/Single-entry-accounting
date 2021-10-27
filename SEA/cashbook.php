@@ -170,7 +170,7 @@ include 'includes/menu.php';
                                         <option value="Beginning balance">Beginning balance</option> 
                                         <option value="Investment">Investment</option>  
                                         <option value="Sales">Sales</option>
-                                        <option value="Service Home">Service Home</option>
+                                        <option value="Service income">Service income</option>
                                         <option value="Bank Financing Long Term">Bank Financing Long Term</option>
                                         <option value="Bank Financing Short Term">Bank Financing Short Term</option>
                                         <option value="Shareholder Investment">Shareholder Investment</option>
