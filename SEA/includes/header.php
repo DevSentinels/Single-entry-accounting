@@ -34,8 +34,8 @@ include_once '../includes/dbprocess.php';
    <body>
    <header class="header">
             <div class="header__container">
-                <img src="./img/james.jpg" alt="ADMIN" class="header__img">
-               
+            <i style="color:#00a98f; font-size:2rem;" class='bx bxs-user-circle header__img '></i>
+           
                
                 <a href="../admin_home.php" class="header__logo"> <span></span></a>
             

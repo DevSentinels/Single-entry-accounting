@@ -36,9 +36,9 @@ include 'includes/menu.php'; ?>
                 <div class="title-wrapper">
                 <h2><?php echo $_SESSION['business_name']?></h2>
                 </div>
-        <div class="title-wrapper">
+        <div class="title-wrapper center">
                     <h2>STATEMENT OF CASH FLOWS</h2>
-                    <p><?php echo $_SESSION ['ISdetails']?></p>
+                    <p class="center" style="text-align: center;"><?php echo $_SESSION ['ISdetails']?></p>
                 </div>
         </div>
 

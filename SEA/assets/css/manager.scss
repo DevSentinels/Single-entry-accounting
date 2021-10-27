@@ -142,6 +142,8 @@ img {
   align-items: center;
   height: var(--header-height);
   justify-content: space-between;
+
+  
 }
 
 .header__img {
@@ -809,6 +811,11 @@ label{
     display: flex;
   }
 
+  .user-icon{
+    color: #179b66;
+    font-size: 1rem;
+  }
+
   input[type="date"]{
     background-color: #179b66;
     margin-top: 8px;
@@ -827,16 +834,20 @@ label{
     cursor: pointer;
     border-radius: 3px;
 }
-
+.center{
+  text-align: center;
+  color: #006e58;
+}
 .title-top{
   display: flex;
   align-items: center;
   justify-content: center;
   flex-direction: column;
   margin: 1rem;
+  text-align: center;
   .title-wrapper{
     color: #006e58;
-   
+  text-align: center;   
   }
   h2{
     font-family: 'poppins';

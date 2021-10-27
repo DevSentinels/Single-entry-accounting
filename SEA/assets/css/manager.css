@@ -895,6 +895,11 @@ label {
   display: flex;
 }
 
+.user-icon {
+  color: #179b66;
+  font-size: 1rem;
+}
+
 input[type="date"] {
   background-color: #179b66;
   margin-top: 8px;
@@ -915,6 +920,11 @@ input[type="date"] {
   border-radius: 3px;
 }
 
+.center {
+  text-align: center;
+  color: #006e58;
+}
+
 .title-top {
   display: -webkit-box;
   display: -ms-flexbox;
@@ -930,10 +940,12 @@ input[type="date"] {
       -ms-flex-direction: column;
           flex-direction: column;
   margin: 1rem;
+  text-align: center;
 }
 
 .title-top .title-wrapper {
   color: #006e58;
+  text-align: center;
 }
 
 .title-top h2 {
