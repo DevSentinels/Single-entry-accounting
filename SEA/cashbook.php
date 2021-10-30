@@ -35,6 +35,7 @@ include 'includes/menu.php';
             </script>
         
             <?php
+                 unset($_SESSION['res_type']); 
                 unset($_SESSION['response']); }
             ?>
 
@@ -104,16 +105,17 @@ include 'includes/menu.php';
 
 <form action="../includes/dbprocess.php" Method="POST">
           <span class="custom-dropdown big">
-               <select id="Month" name="month">    
-                    <option value="1">January</option>
-                    <option value="2">February</option>
-                    <option value="3">March</option>
-                    <option value="4">April</option>
-                    <option value="5">May</option>
-                    <option value="6">June</option>
-                    <option value="7">July</option>
-                    <option value="8">August</option>
-                    <option value="9">September</option>
+               <select id="Month" name="month">  
+                    <option value="" disabled selected>MONTH</option>  
+                    <option value="01">January</option>
+                    <option value="02">February</option>
+                    <option value="03">March</option>
+                    <option value="04">April</option>
+                    <option value="05">May</option>
+                    <option value="06">June</option>
+                    <option value="07">July</option>
+                    <option value="08">August</option>
+                    <option value="09">September</option>
                     <option value="10">October</option>
                     <option value="11">November</option>
                     <option value="12">December</option>
@@ -129,6 +131,7 @@ include 'includes/menu.php';
                     $result = $stmt->get_result();
                 ?>   
                <select id="Year" name="year">    
+                    <option value="" disabled selected>YEAR</option>
                     <?php while ($row = $result->fetch_assoc()) { ?>
                         <option value="<?= $row['year']; ?>"><?= $row['year']; ?></option>
                     <?php } ?>  
@@ -170,7 +173,8 @@ include 'includes/menu.php';
                                         <option value="Beginning balance">Beginning balance</option> 
                                         <option value="Investment">Investment</option>  
                                         <option value="Sales">Sales</option>
-                                        <option value="Service Home">Service Home</option>
+                                        <option value="Service Income">Service Income</option>
+                                        <option value="Customer Deposits">Customer Deposits</option>
                                         <option value="Bank Financing Long Term">Bank Financing Long Term</option>
                                         <option value="Bank Financing Short Term">Bank Financing Short Term</option>
                                         <option value="Shareholder Investment">Shareholder Investment</option>
@@ -285,7 +289,7 @@ include 'includes/menu.php';
                 <td data-label="Outflows"><strong>₱ </strong><?= number_format($row['outflows']) ?></td>
                 <td data-label="Balance"><strong>₱ </strong><?= number_format($row['balance']) ?></td>
                 <td data-label="Actions">
-                    <span data-tooltip="Edit record">
+                    <span data-tooltip="Edit Record">
                     <a href="javascripit:void(0)" class="button editData" data-modal-target="#modal">
                     <span class="button__icon">
                     <ion-icon name="add-circle-outline"></ion-icon>
@@ -293,7 +297,7 @@ include 'includes/menu.php';
                     </a>
                     </span>
 
-                    <span data-tooltip="delete record">
+                    <span data-tooltip="Delete Record">
                     <a href="javascripit:void(0)" class="button deleteData">
                     <span class="button__icon">
                     <ion-icon name="trash-outline"></ion-icon>

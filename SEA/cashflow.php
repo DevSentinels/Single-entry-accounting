@@ -26,6 +26,7 @@ include 'includes/menu.php'; ?>
             </script>
         
             <?php
+                 unset($_SESSION['res_type']); 
                 unset($_SESSION['response']); }
             ?>
 
@@ -74,7 +75,9 @@ include 'includes/menu.php'; ?>
                 </tr>
             </thead>
             <tbody>
-            <?php while ($row = $result->fetch_assoc()) { 
+            <?php 
+            $first_balance  = 0;
+            while ($row = $result->fetch_assoc()) { 
                         $first_balance   = $row['first_balance'];
               
              
@@ -315,6 +318,7 @@ include 'includes/menu.php'; ?>
                
                 <?php 
                 $netC = $totalFIO + $totalINO + $totalOPO;
+                $netC = $netC + $first_balance;
                 if($netC < 0){ ?>
                 <tr style="background-color:#F25E5E;">
                 <th style="color:#fff; text-align:left; " class="total">CASH ENDING</th>

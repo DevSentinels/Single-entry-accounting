@@ -149,7 +149,9 @@
             </script>
         
             <?php
-                unset($_SESSION['response']); }
+                unset($_SESSION['response']); 
+                unset($_SESSION['res_type']);
+              }
             ?>
 
 </body>

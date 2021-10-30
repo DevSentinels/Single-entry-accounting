@@ -101,6 +101,7 @@
             </script>
         
             <?php
+                 unset($_SESSION['res_type']); 
                 unset($_SESSION['response']); }
             ?>
 

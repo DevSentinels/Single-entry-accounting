@@ -17,7 +17,7 @@ include 'includes/menu.php';
 
 ?>
 
-
+<body onload="setDataOnSelection()>
      <div class="title-top">
 
             <div class="title-wrapper">
@@ -36,7 +36,8 @@ include 'includes/menu.php';
                     $stmt->execute();
                     $result = $stmt->get_result();
                 ?>   
-               <select name="year">    
+               <select id = "year_run" name="year">    
+                    <option value="" disabled selected>YEAR</option>
                     <?php while ($row = $result->fetch_assoc()) { ?>
                         <option value="<?= $row['year']; ?>"><?= $row['year']; ?></option>
                     <?php } ?>  
@@ -52,6 +53,12 @@ include 'includes/menu.php';
                         </div>
              </form>
 
+             <script>
+             function setDataOnSelection(){
+                            $('#year_run').val("<?php echo $_SESSION['year_is']?>");
+                        }
+
+                    </script>
 
   <div class="main-content">
                 <div class="info-card">
@@ -96,6 +103,7 @@ include 'includes/menu.php';
             </script>
         
             <?php
+                 unset($_SESSION['res_type']); 
                 unset($_SESSION['response']); }
             ?>
 
@@ -182,6 +190,15 @@ include 'includes/menu.php';
             }
            
           }
+
+          $f_neg = 0;
+          $f_pos = 0;
+
+          $o_neg = 0;
+          $o_pos = 0;
+
+          $i_neg = 0;
+          $i_pos = 0;
 
 
     for ($i=1; $i <= 12 ; $i++) { 
@@ -317,7 +334,7 @@ include 'includes/menu.php';
         var materialOptions = {
           width: 600,
           chart: {
-            title: 'INCOME STATEMENT YEAR END 2021',
+            title: 'INCOME STATEMENT YEAR END <?php echo $_SESSION['year_is']?>',
             subtitle: ''
           },
           series: {
@@ -367,7 +384,7 @@ function drawChart() {
   ]);
 
   var options = {
-    title: 'CASH FLOW FOR THE YEAR ENDED 2021',
+    title: 'CASH FLOW FOR THE YEAR ENDED <?php echo $_SESSION['year_is']?>',
     pieHole: 0.4,
   };
 
@@ -415,7 +432,7 @@ function drawChart() {
                        2]);
 
       var options = {
-        title: "Cashflow of the year ended 2021",
+        title: "Cashflow of the year ended <?php echo $_SESSION['year_is']?>",
         width: 600,
         height: 300,
         bar: {groupWidth: "70%"},
@@ -444,7 +461,7 @@ function drawChart() {
   ]);
 
   var options = {
-    title:'INCOME STATEMENT FOR THE YEAR ENDED 2021'
+    title:'INCOME STATEMENT FOR THE YEAR ENDED <?php echo $_SESSION['year_is']?>'
   };
 
   var chart = new google.visualization.PieChart(document.getElementById('piechart'));
@@ -452,3 +469,6 @@ function drawChart() {
   chart.draw(data, options);
 }
       </script>
+
+
+</body>

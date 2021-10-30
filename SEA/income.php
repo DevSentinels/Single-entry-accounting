@@ -29,7 +29,8 @@ include 'includes/menu.php'; ?>
             });
             </script>
         
-            <?php
+             <?php
+                 unset($_SESSION['res_type']); 
                 unset($_SESSION['response']); }
             ?>
 

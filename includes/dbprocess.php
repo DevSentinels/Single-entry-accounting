@@ -18,12 +18,12 @@ if(isset($_POST['signup_btn'])){
     $BusinessName = $_POST['bname'];
     $PassW = mysqli_real_escape_string($conn, password_hash ($_POST['password'],PASSWORD_DEFAULT));
 
-    $sqlforNoAccount = "SELECT * FROM tblaccounts WHERE email ='$Email'";
+    $sqlforNoAccount = "SELECT * FROM tblaccounts WHERE email ='$Email' OR business_name = '$BusinessName'";
     $sqlrun = mysqli_query($conn, $sqlforNoAccount);
 
     if(mysqli_num_rows($sqlrun)>0){
         header("Location: ../register.php");
-        $_SESSION ['response'] = "Email Address Already Exists!";
+        $_SESSION ['response'] = "Business Already Exists!";
         $_SESSION ['res_type']= "error";
     }else{
     
@@ -74,33 +74,12 @@ if(isset($_POST['login_btn'])){
             $_SESSION ['isLoggedin'] = true;
             $_SESSION ['response'] = "Successfully Login!";
             $_SESSION ['first'] = true;
-
-            $sqlforNoAccount = "SELECT MAX(YEAR(date)) as first_year, MAX(MONTH(date)) as first_month FROM `tblcashbookentry` WHERE `business_name` = '$BusinessName'";
-            $stmt = $conn->prepare($sqlforNoAccount);
-            $stmt->execute();
-            $result = $stmt->get_result();
-        
-            while ($row = $result->fetch_assoc()) {
-                    $firstyear = $row['first_year'];
-                    $firstmonth = $row['first_month'];
-            }
-
-
-            $_SESSION ['year'] = $firstyear;
-            $_SESSION ['month']= $firstmonth;
-            $_SESSION ['year_is'] = $firstyear;
-            $_SESSION ['month_is']= $firstmonth;
+            $_SESSION ['year'] = date("Y");
+            $_SESSION ['month']= date("m");
+            $_SESSION ['year_is'] = date("Y");
+            $_SESSION ['month_is']= date("m");
             
-            $sqlforNoAccount = "SELECT DISTINCT `details` as details FROM `tblincomestatement` WHERE `date_month` = '$firstmonth' AND `date_year` = '$firstyear' AND `business_name` = '$BusinessName' ";
-            $stmt = $conn->prepare($sqlforNoAccount);
-            $stmt->execute();
-            $result = $stmt->get_result();
-        
-            while ($row = $result->fetch_assoc()) {
-                    $ISdetails = $row['details'];
-            }
-            
-            $_SESSION ['ISdetails']= $ISdetails;
+            $_SESSION ['ISdetails']= "for the Month ended October 2021";
             $_SESSION ['res_type']= "success";
             
 
@@ -1575,7 +1554,7 @@ function Header()
     $this->Ln(10);
     // Title
     $this->Cell(100);
-    $this->Cell(0,10,'CASHBOOK ENTRY RECORDS',0,0,'C');
+    $this->Cell(10,10,'CASHBOOK ENTRY RECORDS',0,0,'C');
     $this->Ln(7);
     // Line break
     $this->Ln(10);
@@ -2549,101 +2528,7 @@ function subhead1($ISdetails)
 }
 
 
-if(isset($_POST['download_IS'])){ 
 
-    $BusinessName = $_SESSION ['business_name'];
-    $BusinessOwner =  $_SESSION ['business_owner'];
-    $Yearly =   $_SESSION ['year_is'];
-    $Monthly = $_SESSION ['month_is'];
-    $Detailsly = $_SESSION ['ISdetails'];
-
-    $MonthDetails = array('',
-    'January',
-    'February',
-    'March',
-    'April',
-    'May',
-    'June',
-    'July ',
-    'August',
-    'September',
-    'October',
-    'November',
-    'December',);
-
-
-    if($Monthly == "Q1" || $Monthly == "Q2" || $Monthly == "Q3" || $Monthly == "Q4"){
-
-        $fileName = $BusinessName .'-Income Statement'.$Monthly.'-of-'.$Yearly.'.xlsx';
-        $fileName1 = $BusinessName .'-Income Statement'.$Monthly.'-of-'.$Yearly;
-
-    }else if(strlen($Monthly) == 4){
-        $fileName = $BusinessName .'-Income Statement Year-of-'.$Yearly.'.xlsx';
-        $fileName1 = $BusinessName .'-Income Statement Year-of-'.$Yearly;
-    }else{
-        $fileName = $BusinessName .'-Income Statement-'. $MonthDetails[$Monthly] .$Yearly.'.xlsx';
-         $fileName1 = $BusinessName .'-Income Statement-'. $MonthDetails[$Monthly] .$Yearly;
-    }
-
-
-
-    
-        $spreadsheet = new Spreadsheet();
-        $Excel_writer = new Xlsx($spreadsheet);
-
-
-        $spreadsheet->getProperties()->setCreator($BusinessOwner)
-        ->setLastModifiedBy($BusinessOwner)
-        ->setTitle($fileName1)
-        ->setSubject('Cashbook Entry Report')
-        ->setDescription('Cashbook Entry Report')
-        ->setKeywords('Cashbook Entry Report')
-        ->setCategory('Cashbook Entry Report');
-          
-        $spreadsheet->setActiveSheetIndex(0);
-        $activeSheet = $spreadsheet->getActiveSheet();
-          
-        $activeSheet->setCellValue('A1', 'Description');
-        $activeSheet->setCellValue('B1', 'Amount');
-
-        $activeSheet->setTitle($MonthDetails[$Monthly]);
-
-        foreach ($activeSheet->getColumnIterator() as $column) {
-            $activeSheet->getColumnDimension($column->getColumnIndex())->setAutoSize(true);
-        }
-
-        $styleArray = [
-            'font' => [
-                'bold' => true,
-            ],
-            'alignment' => [
-                'center' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
-            ],
-        ];
-
-        $activeSheet->getStyle('A1:B1')->applyFromArray($styleArray);
-
-          
-        $sqlforNoAccount = "SELECT `description`, `amount` FROM `tblincomestatement` WHERE `date_month` = '$Monthly' AND `date_year` = '$Yearly' AND `business_name` = '$BusinessName' AND `category` = 'INCOME'";
-        $stmt = $conn->prepare($sqlforNoAccount);
-        $stmt->execute();
-        $result = $stmt->get_result();
-
-        $i = 2;
-        while ($row = $result->fetch_assoc()) {
-                $activeSheet->setCellValue('A'.$i , number_format($row['description']));
-                $activeSheet->setCellValue('B'.$i , number_format($row['amount']));
-                $i++;
-            }
-          
-        header('Content-Type: application/vnd.ms-excel');
-        header('Content-Disposition: attachment;filename='. $fileName);
-        header('Cache-Control: max-age=0');
-        $Excel_writer->save('php://output');
-
-
-
-}
 
 
 if(isset($_POST['Search_Monthly_IS'])){
