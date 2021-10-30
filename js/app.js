@@ -48,3 +48,20 @@ function events() {
 }
 
 events();
+
+    var state = false;
+    function toggle(){
+
+      if(state){
+        document.getElementById('password').setAttribute("type", "password")
+        document.getElementById('eye').style.color='grey';
+        state=false;
+      }
+      else{
+        document.getElementById('password').setAttribute("type", "text")
+        state=true;
+        document.getElementById('eye').style.color='green';
+      }
+
+    }
+
