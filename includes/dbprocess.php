@@ -743,7 +743,10 @@ if(isset($_POST['generate-monthly'])){
                     $last_date = $row['date'];
             }
 
-    
+            if($update_description == "Beginning balance"){
+
+            }else{
+                
             if($update_inflows == "0"){
                 $amount = $update_outflows;
                 $category= 'EXPENSES';
@@ -796,6 +799,9 @@ if(isset($_POST['generate-monthly'])){
                     mysqli_stmt_execute($stmt);
                 }
             }
+            }
+
+    
         }
 
         $date = DateTime::createFromFormat('Y-m-d', $last_date);
@@ -878,11 +884,22 @@ if(isset($_POST['generate-monthly'])){
                         $last_date = $row['date'];
 
                         if($f == 0){
-                            $first_balance = $row['balance'];
+                            if($update_description == "Beginning balance"){
+                                $first_balance = $row['balance'];
+                                
+                            }else{
+                                $first_balance = 0;
+                            }
+
                             $f++;
                         }
                 }
-    
+
+                if($update_description == "Beginning balance"){
+
+                }else{
+
+                    
         
                 if($update_inflows == "0"){
                     $amount = $update_outflows;
@@ -947,6 +964,8 @@ if(isset($_POST['generate-monthly'])){
                         mysqli_stmt_bind_param($stmt,"ssssssss",$BusinessName,$Month,$Year,$type,$category,$update_description,$amount,$sign);
                         mysqli_stmt_execute($stmt);
                     }
+                }
+
                 }
             }
     
@@ -1291,59 +1310,67 @@ if(isset($_POST['generate-quarterly'])){
 
             }
 
-    
-            if($update_inflows == "0"){
-                $amount = $update_outflows;
-                $category= 'EXPENSES';
+            if($update_description == "Beginning balance"){
+
             }else{
-                $amount = $update_inflows;
-                $category= 'INCOME';
-            }
-            
-            $type= 'Quarterly';
 
-
-            $sqlforNoAccount = "SELECT is_id, amount FROM tblincomestatement WHERE date_month = '$Quarter' AND date_year = '$Year' AND business_name = '$BusinessName' AND description='$update_description'";
-            $sqlrun = mysqli_query($conn, $sqlforNoAccount);
-    
-            if(mysqli_num_rows($sqlrun)>0){
-            
-                $stmt = $conn->prepare($sqlforNoAccount);
-                $stmt->execute();
-                $result = $stmt->get_result();
-    
-                while ($row = $result->fetch_assoc()) {
-                    $id = $row['is_id']; 
-                    $prev_amount = $row['amount'];
+                if($update_inflows == "0"){
+                    $amount = $update_outflows;
+                    $category= 'EXPENSES';
+                }else{
+                    $amount = $update_inflows;
+                    $category= 'INCOME';
                 }
-
-                $amount = $prev_amount + $amount;
-
-                $sqlforAccounts = "UPDATE tblincomestatement SET amount='$amount' WHERE is_id = ?";
                 
-                $stmt = mysqli_stmt_init($conn);
+                $type= 'Quarterly';
+    
+    
+                $sqlforNoAccount = "SELECT is_id, amount FROM tblincomestatement WHERE date_month = '$Quarter' AND date_year = '$Year' AND business_name = '$BusinessName' AND description='$update_description'";
+                $sqlrun = mysqli_query($conn, $sqlforNoAccount);
         
-                if(!mysqli_stmt_prepare($stmt, $sqlforAccounts)){
-                    echo "SQL Error";
-                }else{
-                    mysqli_stmt_bind_param($stmt,"s",$id);
-                    mysqli_stmt_execute($stmt);
-                }
-
-            }else{
-
-
-                $sqlforAccounts = "INSERT INTO tblincomestatement(is_id,business_name, date_month, date_year, type, category, description, amount) VALUES ('',?,?,?,?,?,?,?);";
+                if(mysqli_num_rows($sqlrun)>0){
+                
+                    $stmt = $conn->prepare($sqlforNoAccount);
+                    $stmt->execute();
+                    $result = $stmt->get_result();
+        
+                    while ($row = $result->fetch_assoc()) {
+                        $id = $row['is_id']; 
+                        $prev_amount = $row['amount'];
+                    }
+    
+                    $amount = $prev_amount + $amount;
+    
+                    $sqlforAccounts = "UPDATE tblincomestatement SET amount='$amount' WHERE is_id = ?";
+                    
+                    $stmt = mysqli_stmt_init($conn);
             
-                $stmt = mysqli_stmt_init($conn);
-        
-                if(!mysqli_stmt_prepare($stmt, $sqlforAccounts)){
-                    echo "SQL Error";
+                    if(!mysqli_stmt_prepare($stmt, $sqlforAccounts)){
+                        echo "SQL Error";
+                    }else{
+                        mysqli_stmt_bind_param($stmt,"s",$id);
+                        mysqli_stmt_execute($stmt);
+                    }
+    
                 }else{
-                    mysqli_stmt_bind_param($stmt,"sssssss",$BusinessName,$Quarter,$Year,$type,$category,$update_description,$amount);
-                    mysqli_stmt_execute($stmt);
+    
+    
+                    $sqlforAccounts = "INSERT INTO tblincomestatement(is_id,business_name, date_month, date_year, type, category, description, amount) VALUES ('',?,?,?,?,?,?,?);";
+                
+                    $stmt = mysqli_stmt_init($conn);
+            
+                    if(!mysqli_stmt_prepare($stmt, $sqlforAccounts)){
+                        echo "SQL Error";
+                    }else{
+                        mysqli_stmt_bind_param($stmt,"sssssss",$BusinessName,$Quarter,$Year,$type,$category,$update_description,$amount);
+                        mysqli_stmt_execute($stmt);
+                    }
                 }
+                
             }
+
+    
+           
         }
 
 
@@ -1424,82 +1451,101 @@ if(isset($_POST['generate-quarterly'])){
                     $update_description = $row['description'];
                     $update_inflows = $row['inflows'];
                     $update_outflows = $row['outflows'];
+
                     
                     if($f == 0){
                         $first_date = $row['date'];
-                        $first_balance = $row['balance'];
+
+                        if($update_description == "Beginning balance"){
+                            $first_balance = $row['balance'];
+                        }else{
+                            $first_balance = 0;
+                        }
+
                         $f++;
+
                     }else{
                         $last_date = $row['date'];
                     }
 
             }
 
-    
-            if($update_inflows == "0"){
-                $amount = $update_outflows;
-                $sign= 'negative';
-            }else{
-                $amount = $update_inflows;
-                $sign= 'positive';
-            }
-            
-            $type = 'Quarterly';
 
+            if($update_description == "Beginning balance"){
 
-            if($update_description == "Equipment" || $update_description == "Vehicle" || $update_description == "Furniture"){
-                $category = 'INVESTING';
-
-            }else if($update_description == "Investment" || $update_description == "Other source of cash" || $update_description == "Other Income" || $update_description == "Bank Financing Long Term" || $update_description == "Loan Payments - Long term"){
-                $category = 'FINANCING';
-            }else{
-                $category = 'OPERATING';
-            }
-
-            
-
-
-            $sqlforNoAccount = "SELECT cf_id, amount FROM tblcashflow WHERE date_month = '$Quarter' AND date_year = '$Year' AND business_name = '$BusinessName' AND description='$update_description'";
-            $sqlrun = mysqli_query($conn, $sqlforNoAccount);
-    
-            if(mysqli_num_rows($sqlrun)>0){
-            
-                $stmt = $conn->prepare($sqlforNoAccount);
-                $stmt->execute();
-                $result = $stmt->get_result();
-    
-                while ($row = $result->fetch_assoc()) {
-                    $id = $row['cf_id']; 
-                    $prev_amount = $row['amount'];
-                }
-
-                $amount = $prev_amount + $amount;
-
-                $sqlforAccounts = "UPDATE tblcashflow SET amount='$amount' WHERE is_id = ?";
                 
-                $stmt = mysqli_stmt_init($conn);
-        
-                if(!mysqli_stmt_prepare($stmt, $sqlforAccounts)){
-                    echo "SQL Error";
-                }else{
-                    mysqli_stmt_bind_param($stmt,"s",$id);
-                    mysqli_stmt_execute($stmt);
-                }
 
             }else{
 
-
-                $sqlforAccounts = "INSERT INTO tblcashflow(cf_id, business_name, date_month, date_year, type, category, description, first_balance, amount, sign, details) VALUES ('',?,?,?,?,?,?,'',?,?,'');";
-            
-                $stmt = mysqli_stmt_init($conn);
-        
-                if(!mysqli_stmt_prepare($stmt, $sqlforAccounts)){
-                    echo "SQL Error";
+                if($update_inflows == "0"){
+                    $amount = $update_outflows;
+                    $sign= 'negative';
                 }else{
-                    mysqli_stmt_bind_param($stmt,"ssssssss",$BusinessName,$Quarter,$Year,$type,$category,$update_description,$amount,$sign);
-                    mysqli_stmt_execute($stmt);
+                    $amount = $update_inflows;
+                    $sign= 'positive';
                 }
+                
+                $type = 'Quarterly';
+    
+    
+                if($update_description == "Equipment" || $update_description == "Vehicle" || $update_description == "Furniture"){
+                    $category = 'INVESTING';
+    
+                }else if($update_description == "Investment" || $update_description == "Other source of cash" || $update_description == "Other Income" || $update_description == "Bank Financing Long Term" || $update_description == "Loan Payments - Long term"){
+                    $category = 'FINANCING';
+                }else{
+                    $category = 'OPERATING';
+                }
+    
+                
+    
+    
+                $sqlforNoAccount = "SELECT cf_id, amount FROM tblcashflow WHERE date_month = '$Quarter' AND date_year = '$Year' AND business_name = '$BusinessName' AND description='$update_description'";
+                $sqlrun = mysqli_query($conn, $sqlforNoAccount);
+        
+                if(mysqli_num_rows($sqlrun)>0){
+                
+                    $stmt = $conn->prepare($sqlforNoAccount);
+                    $stmt->execute();
+                    $result = $stmt->get_result();
+        
+                    while ($row = $result->fetch_assoc()) {
+                        $id = $row['cf_id']; 
+                        $prev_amount = $row['amount'];
+                    }
+    
+                    $amount = $prev_amount + $amount;
+    
+                    $sqlforAccounts = "UPDATE tblcashflow SET amount='$amount' WHERE is_id = ?";
+                    
+                    $stmt = mysqli_stmt_init($conn);
+            
+                    if(!mysqli_stmt_prepare($stmt, $sqlforAccounts)){
+                        echo "SQL Error";
+                    }else{
+                        mysqli_stmt_bind_param($stmt,"s",$id);
+                        mysqli_stmt_execute($stmt);
+                    }
+    
+                }else{
+    
+    
+                    $sqlforAccounts = "INSERT INTO tblcashflow(cf_id, business_name, date_month, date_year, type, category, description, first_balance, amount, sign, details) VALUES ('',?,?,?,?,?,?,'',?,?,'');";
+                
+                    $stmt = mysqli_stmt_init($conn);
+            
+                    if(!mysqli_stmt_prepare($stmt, $sqlforAccounts)){
+                        echo "SQL Error";
+                    }else{
+                        mysqli_stmt_bind_param($stmt,"ssssssss",$BusinessName,$Quarter,$Year,$type,$category,$update_description,$amount,$sign);
+                        mysqli_stmt_execute($stmt);
+                    }
+                }
+                
             }
+
+    
+            
         }
 
 
@@ -1839,58 +1885,63 @@ if(isset($_POST['generate-yearly'])){
 
             }
 
-    
-            if($update_inflows == "0"){
-                $amount = $update_outflows;
-                $category= 'EXPENSES';
+            if($update_description == "Beginning balance"){
+
             }else{
-                $amount = $update_inflows;
-                $category= 'INCOME';
-            }
-            
-            $type= 'Yearly';
 
-
-            $sqlforNoAccount = "SELECT is_id, amount FROM tblincomestatement WHERE date_month = '$Year' AND date_year = '$Year' AND business_name = '$BusinessName' AND description='$update_description'";
-            $sqlrun = mysqli_query($conn, $sqlforNoAccount);
-    
-            if(mysqli_num_rows($sqlrun)>0){
-            
-                $stmt = $conn->prepare($sqlforNoAccount);
-                $stmt->execute();
-                $result = $stmt->get_result();
-    
-                while ($row = $result->fetch_assoc()) {
-                    $id = $row['is_id']; 
-                    $prev_amount = $row['amount'];
+                if($update_inflows == "0"){
+                    $amount = $update_outflows;
+                    $category= 'EXPENSES';
+                }else{
+                    $amount = $update_inflows;
+                    $category= 'INCOME';
                 }
-
-                $amount = $prev_amount + $amount;
-
-                $sqlforAccounts = "UPDATE tblincomestatement SET amount='$amount' WHERE is_id = ?";
                 
-                $stmt = mysqli_stmt_init($conn);
+                $type= 'Yearly';
+    
+    
+                $sqlforNoAccount = "SELECT is_id, amount FROM tblincomestatement WHERE date_month = '$Year' AND date_year = '$Year' AND business_name = '$BusinessName' AND description='$update_description'";
+                $sqlrun = mysqli_query($conn, $sqlforNoAccount);
         
-                if(!mysqli_stmt_prepare($stmt, $sqlforAccounts)){
-                    echo "SQL Error";
-                }else{
-                    mysqli_stmt_bind_param($stmt,"s",$id);
-                    mysqli_stmt_execute($stmt);
-                }
-
-            }else{
-
-
-                $sqlforAccounts = "INSERT INTO tblincomestatement(is_id,business_name, date_month, date_year, type, category, description, amount) VALUES ('',?,?,?,?,?,?,?);";
+                if(mysqli_num_rows($sqlrun)>0){
+                
+                    $stmt = $conn->prepare($sqlforNoAccount);
+                    $stmt->execute();
+                    $result = $stmt->get_result();
+        
+                    while ($row = $result->fetch_assoc()) {
+                        $id = $row['is_id']; 
+                        $prev_amount = $row['amount'];
+                    }
+    
+                    $amount = $prev_amount + $amount;
+    
+                    $sqlforAccounts = "UPDATE tblincomestatement SET amount='$amount' WHERE is_id = ?";
+                    
+                    $stmt = mysqli_stmt_init($conn);
             
-                $stmt = mysqli_stmt_init($conn);
-        
-                if(!mysqli_stmt_prepare($stmt, $sqlforAccounts)){
-                    echo "SQL Error";
+                    if(!mysqli_stmt_prepare($stmt, $sqlforAccounts)){
+                        echo "SQL Error";
+                    }else{
+                        mysqli_stmt_bind_param($stmt,"s",$id);
+                        mysqli_stmt_execute($stmt);
+                    }
+    
                 }else{
-                    mysqli_stmt_bind_param($stmt,"sssssss",$BusinessName,$Year,$Year,$type,$category,$update_description,$amount);
-                    mysqli_stmt_execute($stmt);
+    
+    
+                    $sqlforAccounts = "INSERT INTO tblincomestatement(is_id,business_name, date_month, date_year, type, category, description, amount) VALUES ('',?,?,?,?,?,?,?);";
+                
+                    $stmt = mysqli_stmt_init($conn);
+            
+                    if(!mysqli_stmt_prepare($stmt, $sqlforAccounts)){
+                        echo "SQL Error";
+                    }else{
+                        mysqli_stmt_bind_param($stmt,"sssssss",$BusinessName,$Year,$Year,$type,$category,$update_description,$amount);
+                        mysqli_stmt_execute($stmt);
+                    }
                 }
+                
             }
         }
 
@@ -1980,7 +2031,13 @@ if(isset($_POST['generate-yearly'])){
                     
                     if($f == 0){
                         $first_date = $row['date'];
-                        $first_balance = $row['balance'];
+
+                        if($update_description == "Beginning balance"){
+                            $first_balance = $row['balance'];
+                        }else{
+                            $first_balance = 0;
+                        }
+
                         $f++;
                     }else{
                         $last_date = $row['date'];
@@ -1988,68 +2045,71 @@ if(isset($_POST['generate-yearly'])){
 
             }
 
-    
-            if($update_inflows == "0"){
-                $amount = $update_outflows;
-                $sign= 'negative';
+            if($update_description == "Beginning balance"){
+
             }else{
-                $amount = $update_inflows;
-                $sign= 'positive';
-            }
-            
-            $type = 'Yearly';
-
-
-            if($update_description == "Equipment" || $update_description == "Vehicle" || $update_description == "Furniture"){
-                $category = 'INVESTING';
-
-            }else if($update_description == "Investment" || $update_description == "Other source of cash" || $update_description == "Other Income" || $update_description == "Bank Financing Long Term" || $update_description == "Loan Payments - Long term"){
-                $category = 'FINANCING';
-            }else{
-                $category = 'OPERATING';
-            }
-            
-
-
-            $sqlforNoAccount = "SELECT cf_id, amount FROM tblcashflow WHERE date_month = '$Year' AND date_year = '$Year' AND business_name = '$BusinessName' AND description='$update_description'";
-            $sqlrun = mysqli_query($conn, $sqlforNoAccount);
-    
-            if(mysqli_num_rows($sqlrun)>0){
-            
-                $stmt = $conn->prepare($sqlforNoAccount);
-                $stmt->execute();
-                $result = $stmt->get_result();
-    
-                while ($row = $result->fetch_assoc()) {
-                    $id = $row['cf_id']; 
-                    $prev_amount = $row['amount'];
+                if($update_inflows == "0"){
+                    $amount = $update_outflows;
+                    $sign= 'negative';
+                }else{
+                    $amount = $update_inflows;
+                    $sign= 'positive';
                 }
-
-                $amount = $prev_amount + $amount;
-
-                $sqlforAccounts = "UPDATE tblcashflow SET amount='$amount' WHERE is_id = ?";
                 
-                $stmt = mysqli_stmt_init($conn);
-        
-                if(!mysqli_stmt_prepare($stmt, $sqlforAccounts)){
-                    echo "SQL Error";
+                $type = 'Yearly';
+    
+    
+                if($update_description == "Equipment" || $update_description == "Vehicle" || $update_description == "Furniture"){
+                    $category = 'INVESTING';
+    
+                }else if($update_description == "Investment" || $update_description == "Other source of cash" || $update_description == "Other Income" || $update_description == "Bank Financing Long Term" || $update_description == "Loan Payments - Long term"){
+                    $category = 'FINANCING';
                 }else{
-                    mysqli_stmt_bind_param($stmt,"s",$id);
-                    mysqli_stmt_execute($stmt);
+                    $category = 'OPERATING';
                 }
-
-            }else{
-
-
-                $sqlforAccounts = "INSERT INTO tblcashflow(cf_id,business_name, date_month, date_year, type, category, description,first_balance, amount, sign, details) VALUES ('',?,?,?,?,?,?,'',?,?,'');";
-            
-                $stmt = mysqli_stmt_init($conn);
+                
+    
+    
+                $sqlforNoAccount = "SELECT cf_id, amount FROM tblcashflow WHERE date_month = '$Year' AND date_year = '$Year' AND business_name = '$BusinessName' AND description='$update_description'";
+                $sqlrun = mysqli_query($conn, $sqlforNoAccount);
         
-                if(!mysqli_stmt_prepare($stmt, $sqlforAccounts)){
-                    echo "SQL Error";
+                if(mysqli_num_rows($sqlrun)>0){
+                
+                    $stmt = $conn->prepare($sqlforNoAccount);
+                    $stmt->execute();
+                    $result = $stmt->get_result();
+        
+                    while ($row = $result->fetch_assoc()) {
+                        $id = $row['cf_id']; 
+                        $prev_amount = $row['amount'];
+                    }
+    
+                    $amount = $prev_amount + $amount;
+    
+                    $sqlforAccounts = "UPDATE tblcashflow SET amount='$amount' WHERE is_id = ?";
+                    
+                    $stmt = mysqli_stmt_init($conn);
+            
+                    if(!mysqli_stmt_prepare($stmt, $sqlforAccounts)){
+                        echo "SQL Error";
+                    }else{
+                        mysqli_stmt_bind_param($stmt,"s",$id);
+                        mysqli_stmt_execute($stmt);
+                    }
+    
                 }else{
-                    mysqli_stmt_bind_param($stmt,"ssssssss",$BusinessName,$Year,$Year,$type,$category,$update_description,$amount,$sign);
-                    mysqli_stmt_execute($stmt);
+    
+    
+                    $sqlforAccounts = "INSERT INTO tblcashflow(cf_id,business_name, date_month, date_year, type, category, description,first_balance, amount, sign, details) VALUES ('',?,?,?,?,?,?,'',?,?,'');";
+                
+                    $stmt = mysqli_stmt_init($conn);
+            
+                    if(!mysqli_stmt_prepare($stmt, $sqlforAccounts)){
+                        echo "SQL Error";
+                    }else{
+                        mysqli_stmt_bind_param($stmt,"ssssssss",$BusinessName,$Year,$Year,$type,$category,$update_description,$amount,$sign);
+                        mysqli_stmt_execute($stmt);
+                    }
                 }
             }
         }
@@ -3016,11 +3076,7 @@ function queryTableNC($month, $year, $Bname,$conn){
 
     $netC = $totalFNO + $totalINO + $totalOPO;
 
-    if($netC < 0){
-        $netC = '('.number_format(substr($netC,1)).')';
-      }else{
-        $netC =  number_format($netC);
-      }
+  
     
     $query = "SELECT  first_balance FROM `tblcashflow` WHERE `date_month` = '$month' AND `date_year` = '$year' AND `business_name` = '$Bname'";    
     $stmt = $conn->prepare($query);
@@ -3031,6 +3087,29 @@ function queryTableNC($month, $year, $Bname,$conn){
         $first_balance = $row['first_balance'];
     }   
 
+
+    $ending_balance = $first_balance + $netC;
+
+    if($netC < 0){
+        $netC = '('.number_format(substr($netC,1)).')';
+      }else{
+        $netC =  number_format($netC);
+      }
+
+
+      if($ending_balance < 0){
+        $ending_balance = '('.number_format(substr($ending_balance,1)).')';
+      }else{
+        $ending_balance =  number_format($ending_balance);
+      }
+
+    
+
+            $this->Cell(5);
+            $this->Cell(95,10,'NET CHANGE IN CASH',1,0,'L');
+            $this->Cell(95,10,number_format($netC),1,0,'R');
+            $this->Ln();
+
             $this->Cell(5);
             $this->Cell(95,10,'Cash Beginning',1,0,'L');
             $this->Cell(95,10,number_format($first_balance),1,0,'R');
@@ -3038,7 +3117,7 @@ function queryTableNC($month, $year, $Bname,$conn){
 
             $this->Cell(5);
             $this->Cell(95,10,'Cash Ending',1,0,'L');
-            $this->Cell(95,10,$netC,1,0,'R');
+            $this->Cell(95,10,$ending_balance,1,0,'R');
             $this->Ln();
 
 
@@ -3103,8 +3182,8 @@ function subhead1($ISdetails)
     $pdf->headerTable();
     $pdf->queryTableFN($Monthly, $Yearly, $BusinessName,$conn);
 
-    $pdf->subhead1("NET CHANGE IN CASH");
-    $pdf->headerTable();
+   // $pdf->subhead1("NET CHANGE IN CASH");
+    // $pdf->headerTable();
     $pdf->queryTableNC($Monthly, $Yearly, $BusinessName,$conn);
     
     
