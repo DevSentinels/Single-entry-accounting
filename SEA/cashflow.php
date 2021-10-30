@@ -45,7 +45,7 @@ include 'includes/menu.php'; ?>
 
         <div class="button-wrapper">
         <button data-modal-target="#modal3" class="buttonss views">
-            <span class="button__texts">VIEW IS</span>
+            <span class="button__texts">VIEW CF</span>
             <span class="button__icons">
             <ion-icon name="wallet-outline"></ion-icon>
              </span>

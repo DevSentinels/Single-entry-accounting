@@ -62,7 +62,7 @@
                                 <div class="input-container password">
                                     <label for="password">Password</label>
                                     <input autocomplete="off" type="password"  id="password" name="password" placeholder="Must be at least 6 characters" minlength="6" required>
-                                    <i class='bx bx-hide'></i>
+                                    <i style="cursor: pointer;" class='bx bx-hide' id="eye" aria-hidden="true" onclick="toggle();"></i>
                                 </div>
                                
                                 <div class="input-container cta">
@@ -108,6 +108,9 @@
 
 
 </body>
+<script src="https://kit.fontawesome.com/a81368914c.js"></script>
+    <script src="./js/app.js"></script>
+    <script src="./js/script.js" defer></script>
 </html>
 
 

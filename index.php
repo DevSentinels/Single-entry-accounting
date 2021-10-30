@@ -19,6 +19,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- LINKS -->
+    <link href='https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css' rel='stylesheet'>
     <link rel="shortcut icon" type="image/jpg" href="./img/logo.png"/>
     <link rel="stylesheet" href="./styles/styles.css">
     <link rel="stylesheet" href="./styles/sweetalert.css">
@@ -107,7 +108,7 @@
                     <div class="input-container password">
                         <label for="password">Password</label>
                         <input type="password"  id="password" name="password" placeholder="cover your password" required>
-                        <i class='bx bx-hide'></i>
+                        <i style="color:grey; cursor:pointer;" id="eye" class='bx bx-hide' aria-hidden="true" onclick="toggle();"></i>
                     </div>
                    
                          
