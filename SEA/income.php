@@ -35,6 +35,23 @@ include 'includes/menu.php'; ?>
             ?>
 
 
+        <?php       
+                    $month = $_SESSION['month_is'];
+                    $year = $_SESSION['year_is'];
+                    $Bname =  $_SESSION['business_name'];
+
+                    $query = "SELECT  `details` FROM `tblincomestatement` WHERE `date_month` = '$month' AND `date_year` = '$year' AND `business_name` = '$Bname'";    
+                    $stmt = $conn->prepare($query);
+                    $stmt-> execute();
+                    $result = $stmt->get_result();  
+
+                    while ($row = $result->fetch_assoc()) { 
+                      $details   = $row['details'];
+                    }
+                    
+        ?>  
+
+
         <div class="title-top">
 
                 <div class="title-wrapper">
@@ -42,7 +59,7 @@ include 'includes/menu.php'; ?>
                 </div>
         <div class="title-wrapper">
                     <h2>Income Statement</h2>
-                    <p><?php echo $_SESSION ['ISdetails']?></p>
+                    <p><?php echo $details?></p>
                 </div>
         </div>
 

@@ -32,6 +32,23 @@ include 'includes/menu.php'; ?>
 
 
 <body>
+
+          <?php       
+                    $month = $_SESSION['month_is'];
+                    $year = $_SESSION['year_is'];
+                    $Bname =  $_SESSION['business_name'];
+
+                    $query = "SELECT  `details` FROM `tblcashflow` WHERE `date_month` = '$month' AND `date_year` = '$year' AND `business_name` = '$Bname'";    
+                    $stmt = $conn->prepare($query);
+                    $stmt-> execute();
+                    $result = $stmt->get_result();  
+
+                    while ($row = $result->fetch_assoc()) { 
+                      $details   = $row['details'];
+                    }
+                    
+        ?>  
+
         <div class="title-top">
 
                 <div class="title-wrapper">
@@ -39,19 +56,18 @@ include 'includes/menu.php'; ?>
                 </div>
         <div class="title-wrapper center">
                     <h2>STATEMENT OF CASH FLOWS</h2>
-                    <p class="center" style="text-align: center;"><?php echo $_SESSION ['ISdetails']?></p>
+                    <p class="center" style="text-align: center;"><?php echo $details?></p>
                 </div>
         </div>
 
         <div class="button-wrapper">
         <button data-modal-target="#modal3" class="buttonss views">
-            <span class="button__texts">VIEW IS</span>
+            <span class="button__texts">VIEW CF</span>
             <span class="button__icons">
             <ion-icon name="wallet-outline"></ion-icon>
              </span>
         </button>
         </div>
-
 
 
 
@@ -66,6 +82,8 @@ include 'includes/menu.php'; ?>
                     $result = $stmt->get_result();  
                     
         ?>  
+
+      
 
         <table class="content-table income-table">
             <thead>
