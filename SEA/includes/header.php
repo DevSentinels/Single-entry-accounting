@@ -34,12 +34,13 @@ include_once '../includes/dbprocess.php';
    <body>
    <header class="header">
             <div class="header__container">
-            <i style="color:#00a98f; font-size:2rem;" class='bx bxs-user-circle header__img '></i>
+       
+            
+            <h3 style="color: #00a98f;"><?php echo $_SESSION['business_owner']?></h3>
            
-               
                 <a href="../admin_home.php" class="header__logo"> <span></span></a>
             
-                <h5></h5>
+           
     
                 <div class="header__toggle">
                     <i style="color:#fc5c9c;" class='bx bx-menu' id="header-toggle"></i>

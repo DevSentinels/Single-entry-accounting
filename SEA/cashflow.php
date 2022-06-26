@@ -42,7 +42,7 @@ include 'includes/menu.php'; ?>
                     $stmt = $conn->prepare($query);
                     $stmt-> execute();
                     $result = $stmt->get_result();  
-
+                    $details = "NO DATA AVAILABLE";
                     while ($row = $result->fetch_assoc()) { 
                       $details   = $row['details'];
                     }
@@ -328,6 +328,8 @@ include 'includes/menu.php'; ?>
                 </tr>
             </thead>
             <tbody>
+
+            
                 <tr>
                
                 <td data-label="Description">CASH BEGINNING</td>

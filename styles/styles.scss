@@ -28,8 +28,23 @@
   box-sizing: border-box;
 }
 
+
+@keyframes pulse {
+  0% {
+    background-color: #ffffff;
+  }
+    75% {
+    background-color: #bdf0b3;
+  }
+
+  100%{
+    background-color: #ffffff;
+  }
+}
+
 body {
   font-family: "Poppins", sans-serif;
+  
 }
 
 .stop-scrolling {
@@ -44,8 +59,41 @@ img {
 a {
   text-decoration: none;
 }
+.fadeIn{
+  animation: fadeIn 3s;
+}
+
+.fadeToleft{
+  animation: fadeToleft 3s;
+}
+@keyframes fadeToleft {
+
+  from{
+   transform: translateX(100px);
+  
+    opacity: 0;
+  }
+  to{
+    transform: translateX(0px);
+    opacity: 1;
+   
+  }
+  
+}
+
+@keyframes fadeIn {
+
+  from{
+    opacity: 0;
+  }
+  to{
+    opacity: 1;
+  }
+  
+}
 
 .big-wrapper {
+  animation: pulse 4s ;
   position: relative;
   padding: 1.7rem 0 2rem;
   width: 100%;
@@ -421,7 +469,8 @@ header .container {
 
 .modal-header .title {
   font-size: 1.25rem;
-  font-weight: bold;
+  font-weight: 500;
+  color: #45424b;
 }
 
 .modal-header .close-button {
@@ -556,8 +605,8 @@ text-align: center;
   border: none;
   outline: none;
   padding: 1rem;
-  font-size: 0.75rem;
-  text-transform: uppercase;
+  font-size: 0.8rem;
+  
   letter-spacing: 0.5px;
   border-radius: 8px;
   cursor: pointer;
@@ -566,4 +615,31 @@ text-align: center;
  background-color: #70BC4B;;
 }
 
+
+.check{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: nowrap;
+
+}
+.check p{
+  font-size: .8rem;
+}
+
+.terms{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.terms a{
+  font-size: .8rem;
+  margin:0px 5px;
+}
+
+.login-container p{
+  font-size: .8rem
+}
  @import url(./register.scss);

@@ -29,6 +29,30 @@
           box-sizing: border-box;
 }
 
+@-webkit-keyframes pulse {
+  0% {
+    background-color: #ffffff;
+  }
+  75% {
+    background-color: #bdf0b3;
+  }
+  100% {
+    background-color: #ffffff;
+  }
+}
+
+@keyframes pulse {
+  0% {
+    background-color: #ffffff;
+  }
+  75% {
+    background-color: #bdf0b3;
+  }
+  100% {
+    background-color: #ffffff;
+  }
+}
+
 body {
   font-family: "Poppins", sans-serif;
 }
@@ -46,7 +70,63 @@ a {
   text-decoration: none;
 }
 
+.fadeIn {
+  -webkit-animation: fadeIn 3s;
+          animation: fadeIn 3s;
+}
+
+.fadeToleft {
+  -webkit-animation: fadeToleft 3s;
+          animation: fadeToleft 3s;
+}
+
+@-webkit-keyframes fadeToleft {
+  from {
+    -webkit-transform: translateX(100px);
+            transform: translateX(100px);
+    opacity: 0;
+  }
+  to {
+    -webkit-transform: translateX(0px);
+            transform: translateX(0px);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeToleft {
+  from {
+    -webkit-transform: translateX(100px);
+            transform: translateX(100px);
+    opacity: 0;
+  }
+  to {
+    -webkit-transform: translateX(0px);
+            transform: translateX(0px);
+    opacity: 1;
+  }
+}
+
+@-webkit-keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 .big-wrapper {
+  -webkit-animation: pulse 4s;
+          animation: pulse 4s;
   position: relative;
   padding: 1.7rem 0 2rem;
   width: 100%;
@@ -492,7 +572,8 @@ header .container {
 
 .modal-header .title {
   font-size: 1.25rem;
-  font-weight: bold;
+  font-weight: 500;
+  color: #45424b;
 }
 
 .modal-header .close-button {
@@ -630,8 +711,7 @@ label {
   border: none;
   outline: none;
   padding: 1rem;
-  font-size: 0.75rem;
-  text-transform: uppercase;
+  font-size: 0.8rem;
   letter-spacing: 0.5px;
   border-radius: 8px;
   cursor: pointer;
@@ -639,5 +719,45 @@ label {
 
 .signup-btn:hover {
   background-color: #70BC4B;
+}
+
+.check {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  gap: 6px;
+  -ms-flex-wrap: nowrap;
+      flex-wrap: nowrap;
+}
+
+.check p {
+  font-size: .8rem;
+}
+
+.terms {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+
+.terms a {
+  font-size: .8rem;
+  margin: 0px 5px;
+}
+
+.login-container p {
+  font-size: .8rem;
 }
 /*# sourceMappingURL=styles.css.map */

@@ -161,10 +161,6 @@ include 'includes/menu.php';
                               
                                 <div class="input-container name combobox">
                                   
-                                <input type="date" name="date" id="date" required>
-                                <input type="hidden" name="Olddate" id="Olddate">
-                                <input type="hidden" name="id" id="id">
-                                <input type="hidden" name="od" id="od">
                                
 
                                 <span class="custom-dropdown big large">
@@ -177,7 +173,6 @@ include 'includes/menu.php';
                                         <option value="Customer Deposits">Customer Deposits</option>
                                         <option value="Bank Financing Long Term">Bank Financing Long Term</option>
                                         <option value="Bank Financing Short Term">Bank Financing Short Term</option>
-                                        <option value="Shareholder Investment">Shareholder Investment</option>
                                         <option value="Other source of cash">Other source of cash</option>
                                         <option value="Other Income">Other Income</option>
                                         <option value="Salaries and Wages">Salaries and Wages</option>
@@ -194,16 +189,23 @@ include 'includes/menu.php';
                                         <option value="Interest Income">Interest Income</option>
                                         <option value="Interest Expenses">Interest Expenses</option>
                                         <option value="Administrative Expenses">Administrative Expenses</option>
-                                        <option value="Selling and distribution Expenses">Selling and distribution Expenses</option>
+                                        <option value="Selling and distribution Expenses">Selling and Distribution Expenses</option>
                                         <option value="Other uses of cash">Other uses of cash</option>
                                         <option value="Other Expenses">Other Expenses</option>
                                         <option value="Equipment">Equipment</option>
                                         <option value="Vehicle">Vehicle</option>
                                         <option value="Furniture">Furniture</option>
-                                        <option value="Other non-current assets">Other non-current assets</option>
-                                        <option value="Ending Balance">Ending Balance</option>
                                 </select>
                                 </span>
+
+
+                                <div class="date">
+                                <input type="date" name="date" id="date" required>
+                                <input type="hidden" name="Olddate" id="Olddate">
+                                <input type="hidden" name="id" id="id">
+                                <input type="hidden" name="od" id="od">
+                                </div>
+
                                 </div>
                                 <div class="radio-container">
                                         <div class="container">
@@ -288,7 +290,8 @@ include 'includes/menu.php';
                 <td data-label="Inflows"> <strong>₱ </strong><?= number_format($row['inflows']) ?></td>
                 <td data-label="Outflows"><strong>₱ </strong><?= number_format($row['outflows']) ?></td>
                 <td data-label="Balance"><strong>₱ </strong><?= number_format($row['balance']) ?></td>
-                <td data-label="Actions">
+                <td data-label="Actions" class="seperate">
+
                     <span data-tooltip="Edit Record">
                     <a href="javascripit:void(0)" class="button editData" data-modal-target="#modal">
                     <span class="button__icon">
@@ -304,6 +307,7 @@ include 'includes/menu.php';
                     </span>
                     </a>
                     </span>
+               
                 </td>
                 </tr>
             <?php }?> 

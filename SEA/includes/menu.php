@@ -5,19 +5,23 @@
                     <nav class="nav__container">
                         <div>
                             <a href="./dashboard.php" class="nav__link nav__logo">
-                                <i class='bx bxs-disc nav__icon' ></i>
+                            <i style="font-size: 1.2rem;" class='bx bxs-store' ></i>
                                 <?php  $Bname = $_SESSION['business_name']?>
                                 <span class="nav__logo-name"><?php echo $Bname ?></span>
                             </a>
             
                             <div class="nav__list">
+                                
+                        
                                 <div class="nav__items">
-                                    <h3 class="nav__subtitle">ACCOUNTING</h3>
+                                    
+                                <h3 class="nav__subtitle">ACCOUNTING</h3>
             
                                     <a href="./dashboard.php" class="nav__link active">
                                         <i class='bx bx-home nav__icon' ></i>
                                         <span class="nav__name">DASHBOARD </span>
                                     </a>
+                                  
                                     
                                     <div class="nav__dropdown">
                                         <a href="#" class="nav__link">
@@ -34,14 +38,14 @@
                                             </div>
                                         </div>
                                     </div>
-        
+                                    <a href="../logout.php" class="nav__link">
+                                        <i class='bx bx-log-out nav__icon' ></i>
+                                        <span class="nav__name">LOG OUT</span>
+                                    </a>
                                   
         
+            
         
-        
-                        <a href="../logout.php" class="nav__link nav__logout">
-                            <i class='bx bx-log-out nav__icon' ></i>
-                            <span class="nav__name">Log Out</span>
-                        </a>
+                      
                     </nav>
                 </div>

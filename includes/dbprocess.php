@@ -23,7 +23,7 @@ if(isset($_POST['signup_btn'])){
 
     if(mysqli_num_rows($sqlrun)>0){
         header("Location: ../register.php");
-        $_SESSION ['response'] = "Business Already Exists!";
+        $_SESSION ['response'] = "Credentials Already Exists!";
         $_SESSION ['res_type']= "error";
     }else{
     
@@ -743,17 +743,18 @@ if(isset($_POST['generate-monthly'])){
                     $last_date = $row['date'];
             }
 
-            if($update_description == "Beginning balance"){
+            if($update_description == "Beginning balance" || $update_description == "Investment" || $update_description == "Bank Financing Long Term" || $update_description == "Shareholder Investment" || $update_description == "Other source of cash" || $update_description == "Amortization Expenses" || $update_description == "Loan Payments - Long term" || $update_description == "Other uses of cash" || $update_description == "Equipment" || $update_description == "Vehicle" || $update_description == "Furniture" || $update_description == "Other non-current assets" || $update_description == "Ending Balance"){
 
             }else{
                 
-            if($update_inflows == "0"){
-                $amount = $update_outflows;
-                $category= 'EXPENSES';
-            }else{
-                $amount = $update_inflows;
-                $category= 'INCOME';
-            }
+                if($update_description == "Sales" || $update_description == "Service Income" || $update_description == "Interest Income" || $update_description == "Bank Financing Short Term" || $update_description == "Customer Deposits" || $update_description == "Other Income"){
+                    $amount = $update_inflows;
+                    $category= 'INCOME';
+                }
+                else{
+                    $amount = $update_outflows;
+                    $category= 'EXPENSES';
+                }
             
             $type= 'Monthly';
 
@@ -1416,7 +1417,7 @@ if(isset($_POST['generate-quarterly'])){
                     $update_outflows = $row['outflows'];
                     
                     if($f == 0){
-                        $first_date = $row['date'];
+                        //$first_date = $row['date'];
                         $f++;
                     }else{
                         $last_date = $row['date'];
@@ -1424,16 +1425,17 @@ if(isset($_POST['generate-quarterly'])){
 
             }
 
-            if($update_description == "Beginning balance"){
+            if($update_description == "Beginning balance" || $update_description == "Investment" || $update_description == "Bank Financing Long Term" || $update_description == "Shareholder Investment" || $update_description == "Other source of cash" || $update_description == "Amortization Expenses" || $update_description == "Loan Payments - Long term" || $update_description == "Other uses of cash" || $update_description == "Equipment" || $update_description == "Vehicle" || $update_description == "Furniture" || $update_description == "Other non-current assets" || $update_description == "Ending Balance"){
 
             }else{
 
-                if($update_inflows == "0"){
-                    $amount = $update_outflows;
-                    $category= 'EXPENSES';
-                }else{
+                if($update_description == "Sales" || $update_description == "Service Income" || $update_description == "Interest Income" || $update_description == "Bank Financing Short Term" || $update_description == "Customer Deposits" || $update_description == "Other Income"){
                     $amount = $update_inflows;
                     $category= 'INCOME';
+                }
+                else{
+                    $amount = $update_outflows;
+                    $category= 'EXPENSES';
                 }
                 
                 $type= 'Quarterly';
@@ -1488,12 +1490,12 @@ if(isset($_POST['generate-quarterly'])){
         }
 
 
-        $date1 = DateTime::createFromFormat('Y-m-d', $first_date);
+        //$date1 = DateTime::createFromFormat('Y-m-d', $first_date);
         $date2 = DateTime::createFromFormat('Y-m-d', $last_date);
 
         
 
-        $ISdetails = 'for the Quarter started '. $date1->format('F d') . ' ended ' . $date2->format('F d, Y');
+        $ISdetails = 'for the Quarter ended ' . $date2->format('F d, Y');
 
         $sqlforAccounts = "UPDATE tblincomestatement SET details='$ISdetails' WHERE `date_month` = ? AND `date_year` = ? AND `business_name` = ?";
                 
@@ -1568,16 +1570,14 @@ if(isset($_POST['generate-quarterly'])){
 
                     
                     if($f == 0){
-                        $first_date = $row['date'];
-
                         if($update_description == "Beginning balance"){
                             $first_balance = $row['balance'];
+                            
                         }else{
                             $first_balance = 0;
                         }
 
                         $f++;
-
                     }else{
                         $last_date = $row['date'];
                     }
@@ -1630,7 +1630,7 @@ if(isset($_POST['generate-quarterly'])){
     
                     $amount = $prev_amount + $amount;
     
-                    $sqlforAccounts = "UPDATE tblcashflow SET amount='$amount' WHERE is_id = ?";
+                    $sqlforAccounts = "UPDATE tblcashflow SET amount='$amount' WHERE cf_id = ?";
                     
                     $stmt = mysqli_stmt_init($conn);
             
@@ -1663,12 +1663,12 @@ if(isset($_POST['generate-quarterly'])){
         }
 
 
-        $date1 = DateTime::createFromFormat('Y-m-d', $first_date);
+       // $date1 = DateTime::createFromFormat('Y-m-d', $first_date);
         $date2 = DateTime::createFromFormat('Y-m-d', $last_date);
 
         
 
-        $ISdetails = 'for the Quarter started '. $date1->format('F d') . ' ended ' . $date2->format('F d, Y');
+        $ISdetails = 'for the Quarter ended ' . $date2->format('F d, Y');
 
         $sqlforAccounts = "UPDATE tblcashflow SET details='$ISdetails', first_balance='$first_balance' WHERE `date_month` = ? AND `date_year` = ? AND `business_name` = ?";
                 
@@ -2105,7 +2105,7 @@ if(isset($_POST['generate-yearly'])){
                     $update_outflows = $row['outflows'];
                     
                     if($f == 0){
-                        $first_date = $row['date'];
+                        //$first_date = $row['date'];
                         $f++;
                     }else{
                         $last_date = $row['date'];
@@ -2113,16 +2113,17 @@ if(isset($_POST['generate-yearly'])){
 
             }
 
-            if($update_description == "Beginning balance"){
+            if($update_description == "Beginning balance" || $update_description == "Investment" || $update_description == "Bank Financing Long Term" || $update_description == "Shareholder Investment" || $update_description == "Other source of cash" || $update_description == "Amortization Expenses" || $update_description == "Loan Payments - Long term" || $update_description == "Other uses of cash" || $update_description == "Equipment" || $update_description == "Vehicle" || $update_description == "Furniture" || $update_description == "Other non-current assets" || $update_description == "Ending Balance"){
 
             }else{
 
-                if($update_inflows == "0"){
-                    $amount = $update_outflows;
-                    $category= 'EXPENSES';
-                }else{
+                if($update_description == "Sales" || $update_description == "Service Income" || $update_description == "Interest Income" || $update_description == "Bank Financing Short Term" || $update_description == "Customer Deposits" || $update_description == "Other Income"){
                     $amount = $update_inflows;
                     $category= 'INCOME';
+                }
+                else{
+                    $amount = $update_outflows;
+                    $category= 'EXPENSES';
                 }
                 
                 $type= 'Yearly';
@@ -2174,12 +2175,12 @@ if(isset($_POST['generate-yearly'])){
         }
 
 
-        $date1 = DateTime::createFromFormat('Y-m-d', $first_date);
+       // $date1 = DateTime::createFromFormat('Y-m-d', $first_date);
         $date2 = DateTime::createFromFormat('Y-m-d', $last_date);
 
         
 
-        $ISdetails = 'for the Year started '. $date1->format('F d') . ' ended ' . $date2->format('F d, Y');
+        $ISdetails = 'for the Year ended ' . $date2->format('F d, Y');
 
         $sqlforAccounts = "UPDATE tblincomestatement SET details='$ISdetails' WHERE `date_month` = ? AND `date_year` = ? AND `business_name` = ?";
                 
@@ -2226,7 +2227,7 @@ if(isset($_POST['generate-yearly'])){
             }
 
 
-        $sqlforNoAccount = "SELECT cbe_id FROM tblcashbookentry WHERE ((MONTH(date) >= '$Months[0]' AND MONTH(date) <= '$Months[12]') AND (YEAR(date)= '$Year' AND business_name = '$BusinessName')) Order By date, order_by ASC";
+        $sqlforNoAccount = "SELECT cbe_id FROM tblcashbookentry WHERE ((MONTH(date) >= '$Months[1]' AND MONTH(date) <= '$Months[12]') AND (YEAR(date)= '$Year' AND business_name = '$BusinessName')) Order By date, order_by ASC";
         $stmt = $conn->prepare($sqlforNoAccount);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -2258,10 +2259,9 @@ if(isset($_POST['generate-yearly'])){
                     $update_outflows = $row['outflows'];
                     
                     if($f == 0){
-                        $first_date = $row['date'];
-
                         if($update_description == "Beginning balance"){
                             $first_balance = $row['balance'];
+                            
                         }else{
                             $first_balance = 0;
                         }
@@ -2314,7 +2314,7 @@ if(isset($_POST['generate-yearly'])){
     
                     $amount = $prev_amount + $amount;
     
-                    $sqlforAccounts = "UPDATE tblcashflow SET amount='$amount' WHERE is_id = ?";
+                    $sqlforAccounts = "UPDATE tblcashflow SET amount='$amount' WHERE cf_id = ?";
                     
                     $stmt = mysqli_stmt_init($conn);
             
@@ -2343,12 +2343,12 @@ if(isset($_POST['generate-yearly'])){
         }
 
 
-        $date1 = DateTime::createFromFormat('Y-m-d', $first_date);
+        //$date1 = DateTime::createFromFormat('Y-m-d', $first_date);
         $date2 = DateTime::createFromFormat('Y-m-d', $last_date);
 
         
 
-        $ISdetails = 'for the Year started '. $date1->format('F d') . ' ended ' . $date2->format('F d, Y');
+        $ISdetails = 'for the Year ended ' . $date2->format('F d, Y');
 
         $sqlforAccounts = "UPDATE tblcashflow SET details='$ISdetails', first_balance='$first_balance' WHERE `date_month` = ? AND `date_year` = ? AND `business_name` = ?";
                 
@@ -3230,12 +3230,12 @@ if(isset($_POST['print_CF'])){
 
     if($Monthly == "Q1" || $Monthly == "Q2" || $Monthly == "Q3" || $Monthly == "Q4"){
 
-        $fileName = $BusinessName .'-Income Statement '.$Monthly.'-of-'.$Yearly.'.pdf';
+        $fileName = $BusinessName .'-Cash Flow '.$Monthly.'-of-'.$Yearly.'.pdf';
 
     }else if(strlen($Monthly) == 4){
-        $fileName = $BusinessName .'-Income Statement Year-of-'.$Yearly.'.pdf';
+        $fileName = $BusinessName .'-Cash Flow Year-of-'.$Yearly.'.pdf';
     }else{
-        $fileName = $BusinessName .'-Income Statement '. $MonthDetails[$Monthly] .$Yearly.'.pdf';
+        $fileName = $BusinessName .'-Cash Flow '. $MonthDetails[$Monthly] .$Yearly.'.pdf';
     }
 
 
@@ -3757,7 +3757,7 @@ function subhead1($ISdetails)
     $pdf->headerTable();
     $pdf->queryTableFN($Monthly, $Yearly, $BusinessName,$conn);
 
-    $pdf->subhead1("ÑET CHANGE IN CASH");
+    $pdf->subhead1("NET CHANGE IN CASH");
     $pdf->headerTable();
     $pdf->queryTableNC($Monthly, $Yearly, $BusinessName,$conn);
     

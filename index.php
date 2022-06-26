@@ -19,6 +19,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- LINKS -->
+    <link href='https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css' rel='stylesheet'>
     <link rel="shortcut icon" type="image/jpg" href="./img/logo.png"/>
     <link rel="stylesheet" href="./styles/styles.css">
     <link rel="stylesheet" href="./styles/sweetalert.css">
@@ -59,24 +60,24 @@
           <div class="showcase-area">
             <div class="container">
               <div class="left">
-                <div class="big-title">
+                <div class="big-title fadeIn">
                   <h1>Future is here,</h1>
                   <h1>Single entry accounting</h1>
                 </div>
-                <p class="text">
-                  Here's the simplified , easy to understand.
-                And User friendly accounting system is in your hands!
+                <p class="text fadeIn">
+                  Here's the simplified, easy to understand
+                and User friendly accounting system is in your hands!
                 <br>
-                Keep track the income, expenses and flow of cash of your business
+                Keep track the income, expenses, and flow of cash of your business.
                 </p>
              
                 <div class="cta">
-                  <a href="#" class="btn" data-modal-target="#modal">Sign In</a>
+                  <a href="#" class="btn" data-modal-target="#modal">Log In</a>
                 </div>
               </div>
   
               <div class="right">
-                <img src="./img/hero.png" alt="Person Image" class="person" />
+                <img class="fadeToleft" src="./img/hero.png" alt="Person Image" class="person" />
               </div>
             </div>
           </div>
@@ -92,7 +93,7 @@
     
       <div class="modal" id="modal">
         <div class="modal-header">
-          <div class="title">Sign in</div>
+          <div class="title">Log In</div>
           <button data-close-button class="close-button">&times;</button>
         </div>
         <div class="modal-body">
@@ -107,25 +108,20 @@
                     <div class="input-container password">
                         <label for="password">Password</label>
                         <input type="password"  id="password" name="password" placeholder="cover your password" required>
-                        <i class='bx bx-hide'></i>
+                        <i style="color:grey; cursor:pointer;" id="eye" class='bx bx-hide' aria-hidden="true" onclick="toggle();"></i>
                     </div>
                    
                          
                     <div class="login-container">
-                        <p>You dont have an account? <a href="register.php">Sign up</a></p>
+                        <p>You don't have an account? <a href="register.php">Sign Up</a></p>
                     </div>
-                        <br>
+                       
                         <br>
                     <div class="input-container cta">
-                            <button class="signup-btn" type="submit" name="login_btn">Sign in</button>
+                            <button class="signup-btn" type="submit" name="login_btn">Log In</button>
                     </div>
-                    <section class="copy-legal">
-                        <br>
-                       
-                       
-                        <p>By countinuing, you accept to agree out <br>
-                         <a href="">Privacy policy</a>&amp; <a href="">Terms of service</a></p>
-                    </section>
+                    <br>
+                                    
                 </form>
 
  
