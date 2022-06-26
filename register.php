@@ -200,9 +200,12 @@
 <script src="https://kit.fontawesome.com/a81368914c.js"></script>
     <script src="./js/app.js"></script>
     <script src="./js/script.js" defer></script>
+<<<<<<< HEAD
     <script src="./js/valid.js"></script>
 
     
+=======
+>>>>>>> 0f85fe3cddec4696cb6f9318a5a6efe57546b1ac
 </html>
 
 
